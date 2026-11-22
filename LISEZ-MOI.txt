@@ -1,0 +1,29 @@
+BLOCS MAHÉ — jouer sans Claude
+==============================
+
+Ce dossier contient tout le jeu. Il marche dans n'importe quel navigateur (téléphone, tablette, ordinateur).
+
+1) Jouer tout de suite sur cet appareil
+   Ouvre « index.html » avec ton navigateur (Chrome, Safari, Edge…).
+   Il faut Internet la première fois (le moteur 3D se télécharge).
+
+2) Le mettre en ligne pour le partager (gratuit) — avec Vercel, comme Onde
+   a. Sur github.com : « New repository », nom : blocs-mahe, puis « Create repository ».
+   b. Clique « uploading an existing file » et glisse TOUS les fichiers de ce dossier
+      (index.html, sw.js, manifest.webmanifest, vercel.json, icon-192.png, icon-512.png), puis « Commit changes ».
+   c. Sur vercel.com : « Add New… » → « Project » → importe le dépôt blocs-mahe → « Deploy ».
+      (Aucun réglage à changer : c'est un site simple, sans compilation.)
+   d. Vercel te donne un lien du style https://blocs-mahe.vercel.app : c'est le lien à partager !
+   Pour une mise à jour : remplace index.html dans le dépôt GitHub, Vercel republie tout seul.
+
+   Autre possibilité sans GitHub : app.netlify.com/drop → glisse ce dossier (un compte gratuit permet de garder le site).
+
+3) L'installer comme une vraie appli
+   Ouvre le lien du site sur le téléphone, puis :
+   - Android (Chrome) : menu ⋮ → « Ajouter à l'écran d'accueil » / « Installer l'application ».
+   - iPhone (Safari) : bouton Partager → « Sur l'écran d'accueil ».
+   Après la première visite, le jeu se lance même sans connexion.
+
+Bon à savoir
+- Chaque joueur a sa propre partie, gardée dans son navigateur (mondes, pièces, téléphone, records…).
+- Une partie commencée dans Claude ne passe pas automatiquement sur le site : on recommence une nouvelle partie.
