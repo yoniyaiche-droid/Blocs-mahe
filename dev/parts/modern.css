@@ -1,0 +1,43 @@
+#intro{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;min-width:230px;max-width:86vw;padding:14px 26px 16px;border-radius:26px;color:#fff;text-align:center;box-shadow:0 10px 0 rgba(29,24,70,.25),0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;gap:2px;z-index:6}
+#intro .ic{font-size:52px;line-height:1.1;filter:drop-shadow(0 4px 0 rgba(0,0,0,.18))}
+#intro b{font-size:clamp(24px,7vw,34px);font-weight:800;line-height:1.05;text-shadow:0 3px 0 rgba(0,0,0,.2)}
+#intro span{font-size:15px;font-weight:700;opacity:.96;text-shadow:0 2px 0 rgba(0,0,0,.18)}
+#intro.show{animation:introA 2.8s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes introA{0%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(-6deg)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(1deg)}20%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-64%) scale(.9)}}
+#choice{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(20,14,50,.45);z-index:7;padding:16px}
+#choice.on{display:flex}
+.ch-box{background:#fff;border-radius:26px;max-width:520px;width:100%;max-height:calc(100% - 40px);overflow:auto;padding:12px 14px 16px;box-shadow:0 10px 0 rgba(29,24,70,.25);color:var(--ink)}
+.ch-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:20px;font-weight:800;margin-bottom:4px}
+.ch-sub{margin:0 0 10px;font-size:14px;font-weight:600;color:var(--muted);line-height:1.3}
+.ch-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.ch-grid.wide{grid-template-columns:1fr 1fr}
+.ch-it{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;text-align:left;padding:12px 14px;border-radius:18px;background:#f3f0ff;box-shadow:0 4px 0 rgba(29,24,70,.15);font-family:inherit;color:var(--ink)}
+.ch-it .ic{grid-row:1/3;font-size:34px}
+.ch-it b{font-size:17px;font-weight:800}
+.ch-it .d{font-size:13px;font-weight:600;color:var(--muted);line-height:1.2}
+.ch-it[style*="gradient"] b,.ch-it[style*="gradient"] .d{color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.ch-grid.wide .ch-it{padding:10px;column-gap:8px}.ch-grid.wide .ch-it .ic{font-size:26px}.ch-grid.wide .ch-it b{font-size:15px}
+.ch-it.on{outline:4px solid var(--ink);outline-offset:-2px}
+.ch-it.lock{opacity:.55;filter:grayscale(.6)}
+.ch-it:active{transform:translateY(2px)}
+#bPick.on{background:var(--ink)}
+#brBar{gap:8px}
+body.touch #hud[data-g="island"] #bAct{display:grid}
+#hud[data-g="obby"] .hud-top .pill{background:linear-gradient(135deg,#ff8fc7,#ffb36b);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.15);box-shadow:0 4px 0 #d9608f}
+#hud[data-g="arena"] .hud-top .pill{background:rgba(26,12,48,.9);color:#ffe9a8;box-shadow:inset 0 0 0 2px #ffd23f,0 4px 0 rgba(0,0,0,.35)}
+#hud[data-g="island"] .hud-top .pill{background:#fff5dc;color:#7a4a12;box-shadow:0 4px 0 #e0b36a}
+#hud[data-g="build"] .hud-top .pill{background:#e8f6ff;color:#1d4f7a;box-shadow:0 4px 0 #8fc4ec}
+#hud[data-g="eggs"] .hud-top .pill{background:#fffaf0;color:#3d6b2a;box-shadow:0 4px 0 #8fc96a}
+#hud[data-g="brainrot"] .hud-top .pill{background:rgba(20,10,40,.88);color:#fff;box-shadow:0 0 12px rgba(255,79,216,.65),inset 0 0 0 2px #ff4fd8}
+#hud[data-g="royale"] .hud-top .pill{background:#1f2a44;color:#fff;box-shadow:inset 0 0 0 2px #45a3ff,0 4px 0 #0e1630}
+#hud[data-g="pirates"] .hud-top .pill{background:#1d2b4f;color:#ffe08a;box-shadow:0 4px 0 #0e1630}
+#hud[data-g="arena"] .rbtn{background:rgba(42,22,80,.92);color:#fff}
+#hud[data-g="brainrot"] .rbtn{background:rgba(30,14,60,.92);color:#fff;box-shadow:0 0 14px rgba(43,255,213,.5),0 5px 0 rgba(0,0,0,.3)}
+#hud[data-g="obby"] .rbtn{background:rgba(255,240,248,.95)}
+#hud[data-g="island"] .rbtn{background:rgba(255,248,230,.95)}
+#hud[data-g="pirates"] #pir .rbtn{background:rgba(29,43,79,.92);color:#fff}
+#hud[data-g="brainrot"] .ubtn{background:#1e0e3c;color:#fff;box-shadow:0 0 10px rgba(255,79,216,.6)}
+#hud[data-g="eggs"] .ubtn{background:#fffaf0;color:#3d6b2a;box-shadow:0 4px 0 #8fc96a}
+.hud-top .pill.warn{animation:warnP .6s infinite alternate}
+@keyframes warnP{to{transform:scale(1.08);box-shadow:0 0 0 3px #ff4d6d}}
+#hud[data-g="island"] #compass{top:112px}
