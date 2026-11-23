@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Blocs Mahé">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="build" content="1795461150">
-<script>(function(){var B="1795461150";function chk(){if(!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});location.reload()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setInterval(chk,600000)})();</script>
+<meta name="build" content="1795461614">
+<script>(function(){var B="1795461614",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
 <meta name="theme-color" content="#5ec8ff">
 <title>Blocs Mahé</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3670,7 +3670,7 @@ GAMES.mc={
     if(bp&&pd<16&&this.curP!==bp){ this.curP=bp; banner(bp.temple?'🌊 Un temple englouti ! Plonge pour trouver ses trésors':'🔺 Une pyramide ! Trouve l\'entrée pour découvrir ses trésors'); sfx('cp'); }
     if(pd>22) this.curP=null;
     const show=bd>16&&!this.panel; $('hud').classList.toggle('nav',show);
-    if(show) pointCompass(best.x+0.5,best.z+0.5,'🏘️ '+Math.round(bd)+' m');
+    if(show&&best) pointCompass(best.x+0.5,best.z+0.5,'🏘️ '+Math.round(bd)+' m');
     const show2=bp&&pd>16&&pd<420&&!this.panel; $('hud').classList.toggle('nav2',!!show2);
     if(show2) pointCompass(bp.x+0.5,bp.z+0.5,(bp.temple?'🌊 ':'🔺 ')+Math.round(pd)+' m',2);
   },
@@ -5235,7 +5235,7 @@ GAMES.pirates={
   holdBtn($('bPow'),()=>{ const g=pg(); if(g) g.power(); });
   $('bForm').addEventListener('click',()=>{ const g=pg(); if(g){ sfx('click'); g.toggleForm(); } });
   $('bFruit').addEventListener('click',()=>{ const g=pg(); if(g){ sfx('click'); g.panel==='fruits'?g.closePanel():g.openPanel('fruits'); } });
-  $('pFruitP').addEventListener('click',()=>{ const g=pg(); if(g){ sfx('click'); g.panel==='fruits'?g.closePanel():g.openPanel('fruits'); } });
+  $('hud').addEventListener('click',e=>{ const t=e.target; if(!t||!t.closest||!t.closest('#pFruitP')) return; const g=pg(); if(g){ sfx('click'); g.panel==='fruits'?g.closePanel():g.openPanel('fruits'); } });
   $('bBoat').addEventListener('click',()=>{ const g=pg(); if(g){ sfx('click'); g.summonBoat(); } }); }
 
 /* =========================================================
