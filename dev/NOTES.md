@@ -14,7 +14,7 @@ Jeu fait pour le fils de Yaiche, en français, sur téléphone. Tous les noms et
 | `index.html` (racine) | Version publiée = source + balises PWA + mise à jour automatique + service worker. Générée par `deploy.py`, ne pas modifier à la main. |
 | `deploy.py` | `python3 deploy.py chemin/vers/index.master.html "message"` : ajoute les balises PWA, numérote la version (`<meta name="build">`), change le cache de `sw.js`, commit et push. |
 | `sw.js`, `manifest.webmanifest`, icônes | PWA (hors connexion, mise à jour auto au menu seulement, jamais en pleine partie). |
-| `dev/parts/*.js` | Morceaux ajoutés récemment, **déjà intégrés** dans `index.master.html` (gardés pour référence). |
+| `dev/parts/*.js`, `*.css` | Morceaux ajoutés récemment, **déjà intégrés** dans `index.master.html` (gardés pour référence ; le dernier : `royale2.js` + `royale2.css`). |
 | `dev/test/` | Tests simulés sous Node (faux DOM, faux three.js). |
 | `dev/browser/` | Tests dans un vrai Chrome sans écran (puppeteer). |
 
@@ -28,7 +28,7 @@ Jeu fait pour le fils de Yaiche, en français, sur téléphone. Tous les noms et
 - `build` Bâtisseur : 4 ambiances (`BENV`, `S.buildEnv`), annuler, remplir, pipette, matières texturées (`PAL`).
 - `eggs` Voleurs d'Œufs : ferme, ❗ des gardiens, animaux brillants (`sh`), œuf doré, compagnon.
 - `brainrot` Brainrot Bazar : néons, mutations (`BRMUT`, `S.br.muts`), fête disco, pluie de billets, album (`S.br.dex`).
-- `royale` Bataille Royale : inchangée sauf musique et couleurs.
+- `royale` Bataille Royale (section 18, `parts/royale2.js`) : au départ, choix du mode (`RB_MODES` : `easy` Tranquille, `classic`, `duo` avec un robot allié ; retenu dans `S.rb.mode`), la montgolfière attend ce choix (`G.setMode(k)`). Île modernisée (ciel, plage, chemins, fontaine, phare, moulin, bateaux, tempête animée). Équipes : `team` 0 = joueur + allié, pas de tir ami. 5 cases d'objets (touche 1-5) ; nouveaux objets empilables `grenade` (Bonbombe, ×3, lancer en cloche) et `grapple` (Grappin, ×4) ; les robots ne les ramassent pas. Karts (`G.karts`, bouton `#bKart` ou touche R, on bouscule les robots), champignons rebondissants (`G.pads`, vol plané), ravitaillements avec ballons au début des phases de tempête 2 et 4 (`spawnDrop`), robots qui construisent un mur quand on les touche (`buildAt`), chiffres de dégâts (`#dmgNums`), séries d'éliminations, record `S.best.royaleKills`.
 - `mc` Monde de Blocs (monde infini) : armes 150-154, fusée 160, missions, argent, alliés, Lune ; **jeu à distance** (PeerJS 1.5.4 via jsDelivr/unpkg, code de 5 lettres, monde partagé, avatars, messages rapides). Ids d'objets pris : 100-102, 110-119, 130-142, 150-154, 160.
 - `pirates` Océan des Fruits : îles, bateau, 6 fruits mystiques qui transforment, boss.
 
@@ -42,16 +42,16 @@ Sauvegarde : `S` dans `localStorage` (valeurs par défaut `DEF`, nettoyage au ch
 - `G.sky` était déjà utilisé par un ancien jeu : le dôme de ciel s'appelle `G.skyDome`.
 - Le faux DOM des tests Node n'a pas `querySelector`.
 
-## Tester (les chemins dans les scripts sont ceux de l'ancienne session : à adapter)
+## Tester (les scripts lisent `/home/claude/blocs-mahe/dev/index.master.html` et travaillent dans `/home/claude/test` et `/home/claude/browser` : copier `dev/test/*` et `dev/browser/*` dans ces dossiers)
 
-1. `dev/test/mkapp.py` lit la page et écrit `app.js` avec un accès `window.__t`. Puis `SEED=7 node harness.js`, `SEED=3 node t_pir.js`, `SEED=11 node t_mc2.js`, `SEED=5 node t_modern.js` → « TOUT EST OK ».
+1. `dev/test/mkapp.py` lit la page et écrit `app.js` avec un accès `window.__t`. Puis `SEED=7 node harness.js`, `SEED=3 node t_pir.js`, `SEED=11 node t_mc2.js`, `SEED=5 node t_modern.js`, `SEED=5 node t_royale.js` → « TOUT EST OK ». Attention : quelques vérifications de `harness.js` dépendent de la graine (déjà vrai avant la Bataille Royale, ex. graines 1, 4, 21) ; en cas d'échec isolé hors du jeu modifié, essayer une autre graine.
 2. Chrome : récupérer three.js r128 par git (pas d'accès réseau direct) :
    `git clone --depth 1 --branch r128 --filter=blob:none --sparse https://github.com/mrdoob/three.js && cd three.js && git sparse-checkout set build`
-   puis `python3 mk.py`, un serveur `python3 -m http.server 8767`, et `node run.js http://127.0.0.1:8767/game_t.html x.png t_all.js` (puppeteer dans `/opt/npm-tools/node_modules`, Chrome dans `/usr/bin/google-chrome`). `run2.js` teste le jeu à distance avec deux téléphones simulés.
+   puis `python3 mk.py`, un serveur `python3 -m http.server 8767 --bind 127.0.0.1` (le lancer seul, comme tâche de fond), et `node run.js http://127.0.0.1:8767/game_t.html x.png t_all.js` (puppeteer dans `/opt/npm-tools/node_modules`, Chrome dans `/usr/bin/google-chrome`). `run2.js` teste le jeu à distance avec deux téléphones simulés. `t_royale_look.js` prend des captures de la Bataille Royale (`r1_choix.png`…).
 
 ## Idées pas encore faites
 
-- Bataille Royale : nouveautés de gameplay.
+- Bataille Royale : jouer à distance avec des copains (comme le Monde de Blocs).
 - Jeu à distance pour d'autres jeux que le Monde de Blocs (animaux et véhicules garés non partagés).
 - Export / import de la sauvegarde.
 - Tests au toucher sur un vrai téléphone (jamais faits).

@@ -1,0 +1,13 @@
+#bKart{right:139px;bottom:140px;width:58px;height:58px;font-size:26px}
+#hud[data-g="royale"].nearKart #bKart{display:grid}
+#hotbar button{position:relative}
+#hotbar button[data-n]::after{content:attr(data-n);position:absolute;right:3px;bottom:1px;font-size:12px;font-weight:900;color:#1d1846}
+#allyRow{display:flex;align-items:center;gap:4px}
+#allyRow span{font-size:12px;line-height:1}
+#allyRow .bar{flex:1;height:8px;border-width:1.5px}
+#alBar{background:#9be7a0}
+#dmgNums{inset:0;pointer-events:none;overflow:hidden}
+#dmgNums .dn{position:absolute;transform:translate(-50%,-50%);font-weight:900;font-size:21px;color:#fff;white-space:nowrap;text-shadow:0 2px 0 #1d1846,0 0 6px rgba(29,24,70,.6);animation:dnUp .85s ease-out forwards}
+#dmgNums .dn.sh{color:#8fd0ff}
+#dmgNums .dn.big{color:#ffd23f;font-size:27px}
+@keyframes dnUp{0%{opacity:0;margin-top:6px;transform:translate(-50%,-50%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;margin-top:-46px;transform:translate(-50%,-50%) scale(1)}}

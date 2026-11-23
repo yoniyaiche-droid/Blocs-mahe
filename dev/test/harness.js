@@ -76,7 +76,7 @@ ctx.window = ctx;
 // SEEDED : hasard reproductible
 { let a = +(process.env.SEED || Date.now() % 100000); const r = () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const M = Object.create(Math); M.random = r; ctx.Math = M; console.log('graine ' + (process.env.SEED || 'auto')); }
-const hb = document.getElementById('hotbar'); for (let i = 0; i < 4; i++) hb.appendChild(new FakeEl('button'));
+const hb = document.getElementById('hotbar'); for (let i = 0; i < 5; i++) hb.appendChild(new FakeEl('button'));
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(__dirname + '/app.js', 'utf8'), ctx, { filename: 'app.js' });
 
@@ -362,7 +362,9 @@ T.exitGame();
 
 {
 console.log('BATAILLE ROYALE');
-T.startGame('royale'); G = T.getG(); frames(60);
+T.startGame('royale'); G = T.getG(); frames(30);
+check(G.frozen && Math.abs(P.x - G.bus.x) < 0.01 && G.bus.t === 0, 'le choix du mode met la montgolfière en attente');
+G.setMode('classic'); frames(60);
 check(G.frozen && Math.abs(P.y - (G.bus.y + 0.2)) < 0.01 && P.x > -85, 'le joueur est dans la montgolfière qui avance (x=' + P.x.toFixed(1) + ')');
 P.jumpBuf = 0.2; frames(2);
 check(!G.frozen && P.fall < 0, 'sauter de la montgolfière');
@@ -388,14 +390,14 @@ check(tb.hp < hp0 || !tb.alive, 'les tirs de peinture touchent un bot (pv ' + hp
 tb.x = 60; tb.z = 60;
 // construction : rampe puis montée
 place(spot[0], 0, spot[1]); frames(5); G.wood = 100;
-G.build('ramp'); frames(10);
-check(G.pieces.length === 1 && G.wood === 90, 'construire une rampe coûte 10 bois');
+const pc0 = G.pieces.length; G.build('ramp'); frames(10);
+check(G.pieces.length === pc0 + 1 && G.wood === 90, 'construire une rampe coûte 10 bois');
 T.joy.y = 1; let maxY = 0; for (let i = 0; i < 90; i++) { frames(1); maxY = Math.max(maxY, P.y); } T.joy.y = 0;
 check(maxY > 3, 'on peut monter sur la rampe (hauteur ' + maxY.toFixed(2) + ')');
 frames(60);
 G.build('wall'); G.build('floor'); frames(5);
 check(G.pieces.length >= 2, 'construire un mur et un sol');
-const pc = G.pieces[0]; G.hitPiece(pc, 500);
+const pc = G.pieces[G.pieces.length - 1]; G.hitPiece(pc, 500);
 check(G.pieces.indexOf(pc) < 0, 'une construction peut être détruite');
 // ramassage
 place(spot[0], 0, spot[1]); frames(3);
@@ -644,7 +646,7 @@ check(true, 'panneaux mods et inventaire');
   place(spot[0] + 0.5, spot[1] + 5, spot[2] + 0.5); P.vy = -12; let wet = false; for (let i = 0; i < 60; i++) { frames(1); if (G.inWater) wet = true; }
   check(wet, 'sauter dans l\'eau : plouf !');
   G.setView(false);
-  const html = fs.readFileSync('/home/claude/cubiverse/index.html', 'utf8');
+  const html = fs.readFileSync('/home/claude/blocs-mahe/dev/index.master.html', 'utf8');
   check(html.includes('<title>Blocs Mahé</title>') && html.includes('<span>Blocs Mahé</span>') && !/>[^<]*Cubiverse/.test(html), 'l\'application s\'appelle Blocs Mahé');
 }
 // animaux marins et lézards
@@ -856,7 +858,7 @@ if (process.env.MAP) { const N = 400, x0 = -160, z0 = -160, px = []; const C = {
   place(G.spawn[0] + 150.5, G.colTop(Math.floor(G.spawn[0] + 150), Math.floor(G.spawn[2])), G.spawn[2]); frames(10);
   G.openPhone('house'); findAll(ui, e => e._cls && e._cls.has('ph-btn'))[0].fire('click');
   check(Math.hypot(P.x - G.spawn[0], P.z - G.spawn[2]) < 1 && G.panel === null, 'appli Maison : retour à la maison en un clic');
-  { const html = fs.readFileSync('/home/claude/cubiverse/index.html', 'utf8');
+  { const html = fs.readFileSync('/home/claude/blocs-mahe/dev/index.master.html', 'utf8');
     const tagOf = id => (html.match(new RegExp('<[^>]*id="' + id + '"[^>]*>')) || [''])[0];
     check(/class="[^"]*\bia\b/.test(tagOf('mcPhoneUI')) && /class="[^"]*\bia\b/.test(tagOf('mcPhone')), 'le téléphone et son bouton réagissent au doigt (classe ia)');
     const top = +(html.match(/#mcPhoneUI\{top:(\d+)px/) || [])[1], bar = html.match(/#mcBar\{top:(\d+)px/), btn = html.match(/#mcBar \.iconbtn\{width:(\d+)px;height:(\d+)px/);
@@ -869,7 +871,7 @@ if (process.env.MAP) { const N = 400, x0 = -160, z0 = -160, px = []; const C = {
   T.save && T.save(); check(true, 'téléphone gardé');
 }
 // la console de jeux
-{ const html = fs.readFileSync('/home/claude/cubiverse/index.html', 'utf8'), tagOf = id => (html.match(new RegExp('<[^>]*id="' + id + '"[^>]*>')) || [''])[0];
+{ const html = fs.readFileSync('/home/claude/blocs-mahe/dev/index.master.html', 'utf8'), tagOf = id => (html.match(new RegExp('<[^>]*id="' + id + '"[^>]*>')) || [''])[0];
   check(/\bia\b/.test(tagOf('mcCon')) && /\bia\b/.test(tagOf('mcConB')), 'la console et son bouton 🎮 réagissent au doigt');
   check(!/Nintendo|Joy-Con/i.test(html), 'console originale (pas de marque copiée)');
   G.closePanel(); els.mcConB.fire('click'); const con = els.mcCon;
