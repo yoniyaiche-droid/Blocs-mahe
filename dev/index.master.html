@@ -323,12 +323,17 @@ body:not(.touch) #mcHot{bottom:12px}
 #mcNet,#netChatB{position:absolute;left:12px;display:none;width:46px;height:46px;font-size:22px}
 #mcNet{top:158px}#netChatB{top:212px}
 #hud[data-g="mc"] #mcNet{display:grid}
-#hud.net[data-g="mc"] #netChatB{display:grid}
+#hud.net #netChatB,#hud.net #mcNet{display:grid}
 #mcNet .nb{position:absolute;right:-5px;top:-5px;background:#22c55e;color:#fff;border-radius:99px;font-size:12px;font-weight:800;padding:1px 6px;display:none;line-height:16px}
 #hud.net #mcNet .nb{display:block}
 #netChat{position:absolute;left:66px;top:158px;display:none;flex-direction:column;gap:5px;z-index:5}
 #netChat.on{display:flex}
 #netChat button{background:#fff;color:var(--ink);font-weight:800;font-size:15px;padding:8px 12px;border-radius:14px;text-align:left;box-shadow:0 3px 0 rgba(29,24,70,.2);font-family:inherit}
+#netPanel .net-st2{font-size:16px;font-weight:800;background:#f3efff;border-radius:14px;padding:8px 12px;color:#5a3fd1}
+#netBoard{position:absolute;left:66px;top:158px;display:none;flex-direction:column;gap:2px;background:rgba(29,24,70,.62);color:#fff;border-radius:12px;padding:5px 9px;font-size:12px;font-weight:800;pointer-events:none;max-width:52vw}
+#netBoard.on{display:flex}#netBoard div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#netBoard .me{color:#ffd23f}
+#hud #netChat.on~#netBoard{display:none}
+#hud[data-g="build"] #mcNet,#hud[data-g="build"] #netBoard,#hud[data-g="build"] #netChat{top:228px}#hud[data-g="build"] #netChatB{top:282px}#hud[data-g="build"] #netFeed{top:336px}
 #netFeed{position:absolute;left:12px;top:266px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:72vw;pointer-events:none}
 #netFeed .nf{background:rgba(29,24,70,.72);color:#fff;font-weight:700;font-size:14px;padding:5px 10px;border-radius:12px;animation:nfIn .25s}
 @keyframes nfIn{from{opacity:0;transform:translateX(-10px)}}
@@ -472,7 +477,7 @@ body.touch #hud[data-g="pirates"] #bAct{display:grid}
   <button class="iconbtn ia hbtn" id="bHome" aria-label="Retour à l'accueil">🏠</button>
   <div class="hud-top" id="hudTop"></div>
   <div id="intro"></div><div id="choice" class="ia"></div>
-  <button class="iconbtn ia" id="mcNet" aria-label="Jouer avec des copains">👥<span class="nb" id="netN">1</span></button><button class="iconbtn ia" id="netChatB" aria-label="Messages rapides">💬</button><div id="netChat" class="ia"></div><div id="netFeed"></div>
+  <button class="iconbtn ia" id="mcNet" aria-label="Jouer avec des copains">👥<span class="nb" id="netN">1</span></button><button class="iconbtn ia" id="netChatB" aria-label="Messages rapides">💬</button><div id="netChat" class="ia"></div><div id="netBoard"></div><div id="netFeed"></div>
   <div class="pill hud-coins" id="hudCoinPill"><span class="coin"></span><b id="hudCoins">0</b></div>
   <div id="compass"><div class="arrow"><svg viewBox="0 0 24 24" id="cArrow"><path d="M12 2 20 21 12 16.5 4 21Z" fill="#ff4f8b" stroke="#1d1846" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div class="dist" id="cDist"></div></div>
   <div id="compass2"><div class="arrow"><svg viewBox="0 0 24 24" id="cArrow2"><path d="M12 2 20 21 12 16.5 4 21Z" fill="#ffb020" stroke="#1d1846" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div class="dist" id="cDist2"></div></div>
@@ -2520,7 +2525,7 @@ GAMES.royale={
     if(!S.best.royalePlace||place<S.best.royalePlace) S.best.royalePlace=place;
     save();
     showResult(win?{icon:'👑',title:'Champion de l\'île !',sub:'Tu es le dernier debout, bravo '+S.name+' !',stats:[['Place','1re / 16'],['Éliminations',this.kills],['Pièces gagnées','+'+coins]]}
-      :{icon:'🎨',title:'Éliminé !',sub:by?'Repeint par 🤖 '+by.name+'.':'La tempête t\'a rattrapé.',stats:[['Place',place+'e / 16'],['Éliminations',this.kills],['Pièces gagnées','+'+coins]]});
+      :{icon:'🎨',title:'Éliminé !',sub:by?'Repeint par '+(by.net?'👤 ':'🤖 ')+by.name+'.':'La tempête t\'a rattrapé.',stats:[['Place',place+'e / 16'],['Éliminations',this.kills],['Pièces gagnées','+'+coins]]});
   },
   stop(){ for(const b of this.bots) disposeAvatar(b.A); $('hud').classList.remove('bus'); $('hud').classList.remove('building'); $('stormFx').style.opacity='0'; this.firing=false; },
   hud(){
@@ -5081,10 +5086,10 @@ GAMES.pirates={
    et les blocs modifiés, puis chaque bloc posé ou cassé
    est envoyé aux autres.
    ========================================================= */
-const NET_VER=1, NET_PREFIX='blocsmahe-v1-', NET_MAX=6, NET_ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const NET_VER=2, NET_PREFIX='blocsmahe-v1-', NET_MAX=6, NET_ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const NET_LIBS=['https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js'];
-const NET_CHAT=['👋 Salut !','👍 D\'accord !','🏃 Viens ici !','👀 Regarde !','⛏️ On construit ?','🧟 Attention, monstres !','😂 Trop drôle !','❤️ Merci !'];
-const NET={role:null,peer:null,host:null,code:'',conns:new Map(),players:new Map(),myId:'',world:null,wbuf:null,spawn:null,applying:false,out:[],sT:0,eT:0,dT:0,nid:0,busy:false,msg:'',err:'',tok:0,jt:0,starting:false};
+const NET_CHAT=['👋 Salut !','👍 D\'accord !','🏃 Viens ici !','👀 Regarde !','⛏️ On construit ?','🧟 Attention, monstres !','😂 Trop drôle !','❤️ Merci !','🏁 On fait la course ?','🎮 On change de jeu ?','🔁 On rejoue ?','🏆 Bien joué !'];
+const NET={role:null,peer:null,host:null,code:'',conns:new Map(),players:new Map(),myId:'',world:null,wbuf:null,spawn:null,applying:false,out:[],sT:0,eT:0,dT:0,nid:0,busy:false,msg:'',err:'',tok:0,jt:0,starting:false,game:null,round:0,wait:{},scT:0,scV:'',bT:0,sw:false,lx:0,lz:0,lt:0};
 function netCode(){ let s=''; for(let i=0;i<5;i++) s+=NET_ABC[Math.floor(Math.random()*NET_ABC.length)]; return s; }
 function netLoadLib(){
   if(window.Peer) return Promise.resolve();
@@ -5118,16 +5123,17 @@ function netCleanName(n){ return (typeof n==='string'?n:'').replace(/[\u0000-\u0
 function netCleanAv(a){ const d=DEF.avatar, o={}; a=a&&typeof a==='object'?a:{};
   for(const k of ['skin','shirt','pants','shoes']) o[k]=typeof a[k]==='string'&&/^#[0-9a-f]{6}$/i.test(a[k])?a[k]:d[k];
   o.face=FACES.some(f=>f.id===a.face)?a.face:d.face; o.hat=HATS.some(h=>h.id===a.hat)?a.hat:'none'; return o; }
-function netAddPlayer(id,name,av){ const old=NET.players.get(id); if(old) netFreeP(old); const p={id,name:netCleanName(name),av:netCleanAv(av),A:null,s:null,veh:null,vk:''}; NET.players.set(id,p); netBadge(); return p; }
-function netFreeP(p){ if(p.A){ if(p.A.root.parent) p.A.root.parent.remove(p.A.root); disposeAvatar(p.A); p.A=null; } if(p.veh){ if(p.veh.g.parent) p.veh.g.parent.remove(p.veh.g); p.veh=null; } p.vk=''; }
+function netAddPlayer(id,name,av){ const old=NET.players.get(id); if(old) netFreeP(old); const p={id,name:netCleanName(name),av:netCleanAv(av),A:null,s:null,veh:null,vk:'',k:0,st:0,sc:'',look:''}; NET.players.set(id,p); netBadge(); return p; }
+function netFreeP(p){ if(p.A){ if(p.A.root.parent) p.A.root.parent.remove(p.A.root); disposeAvatar(p.A); p.A=null; } if(p.veh){ if(p.veh.g.parent) p.veh.g.parent.remove(p.veh.g); if(p.veh.free) p.veh.free(); p.veh=null; } p.vk=''; p.look=''; }
 function netRemovePlayer(id){ const p=NET.players.get(id); if(!p) return; netFreeP(p); NET.players.delete(id); netBadge(); }
-function netBadge(){ const b=$('netN'); if(b) b.textContent=String(NET.players.size+1); }
-function netFeed(t){ const f=$('netFeed'); if(!f) return; const d=el('div','nf'); d.textContent=t; f.appendChild(d); while(f.children.length>4) f.removeChild(f.children[0]); setTimeout(()=>{ if(d.parentNode) d.parentNode.removeChild(d); },7000); }
+function netBadge(){ const b=$('netN'); if(b) b.textContent=String(NET.players.size+1); if(mode==='menu'&&typeof renderPlay==='function'&&$('pane-play')) rerender('pane-play',renderPlay); }
+function netFeed(t){ if(mode!=='game'){ toast(t); return; } const f=$('netFeed'); if(!f) return; const d=el('div','nf'); d.textContent=t; f.appendChild(d); while(f.children.length>4) f.removeChild(f.children[0]); setTimeout(()=>{ if(d.parentNode) d.parentNode.removeChild(d); },7000); }
 function netStatus(t){ NET.msg=t; netRender(); }
 function netReset(){
   clearTimeout(NET.jt); NET.tok++;
   NET.players.forEach(p=>netFreeP(p)); NET.players=new Map(); NET.conns=new Map();
-  Object.assign(NET,{role:null,peer:null,host:null,code:'',myId:'',world:null,wbuf:null,spawn:null,out:[],busy:false,msg:''});
+  Object.assign(NET,{role:null,peer:null,host:null,code:'',myId:'',world:null,wbuf:null,spawn:null,out:[],busy:false,msg:'',game:null,wait:{},scV:''});
+  const nb=$('netBoard'); if(nb){ nb.innerHTML=''; nb.classList.remove('on'); }
   const h=$('hud'); if(h) h.classList.remove('net'); const c=$('netChat'); if(c) c.classList.remove('on'); netBadge();
 }
 function netLeave(quiet){
@@ -5142,6 +5148,7 @@ function netFail(e){ const peer=NET.peer; netReset(); try{ if(peer) peer.destroy
 function netLost(msg){
   if(!NET.role) return; const guest=NET.role==='guest'; netLeave(true); banner(msg); sfx('nope');
   if(guest) setTimeout(()=>{ if(mode==='game'&&G&&G.id==='mc'&&G.netGuest) exitGame(); },2500);
+  if(G) G.netR=0;
 }
 function netPeerError(e){ if(NET.role==='joining'&&e.type==='peer-unavailable') netFail(e); }
 function netBroadcast(m,except){ NET.conns.forEach((c,k)=>{ if(k!==except){ try{ c.send(m); }catch(e){} } }); }
@@ -5156,8 +5163,8 @@ async function netHost(){
     if(!p) throw {type:'server'};
     Object.assign(NET,{peer:p,code,role:'host',myId:'h',nid:0,busy:false,msg:''});
     p.on('connection',c=>netAccept(c));
-    if(!(mode==='game'&&G&&G.id==='mc')){ netClosePanel(); startGame('mc'); }
-    $('hud').classList.add('net'); netBadge(); netRender();
+    if(mode==='game'&&G) netAdopt();
+    $('hud').classList.toggle('net',mode==='game'); netBadge(); netRender();
     banner('👥 Partie ouverte ! Code : '+code); netFeed('🟢 Donne le code '+code+' à tes copains');
   }catch(e){ if(tok===NET.tok) netFail(e); }
 }
@@ -5168,24 +5175,29 @@ function netAccept(c){
     if(!id){
       if(d.t!=='hello') return;
       if(d.v!==NET_VER){ c.send({t:'old'}); setTimeout(()=>c.close(),600); return; }
-      if(NET.conns.size>=NET_MAX-1||!(G&&G.id==='mc'&&G.changes)){ c.send({t:'full'}); setTimeout(()=>c.close(),600); return; }
+      if(NET.conns.size>=NET_MAX-1){ c.send({t:'full'}); setTimeout(()=>c.close(),600); return; }
       id='p'+(++NET.nid); const pl=netAddPlayer(id,d.name,d.av);
-      netSendWorld(c,id);
+      const players=[{id:'h',name:S.name,av:S.avatar}]; NET.players.forEach((q,k)=>{ if(k!==id) players.push({id:k,name:q.name,av:q.av}); });
+      c.send({t:'welcome',id,players});
       netBroadcast({t:'join',id,name:pl.name,av:pl.av},null);
-      NET.conns.set(id,c); netFeed('👋 '+pl.name+' a rejoint la partie'); sfx('cp'); netRender(); return;
+      NET.conns.set(id,c); c.send({t:'ready'}); if(NET.game) netSendGo(c);
+      netFeed('👋 '+pl.name+' a rejoint la partie'); sfx('cp'); netRender(); return;
     }
     netHandle(id,d);
   }catch(e){ console.warn(e); } });
   c.on('close',()=>{ if(id&&NET.conns.get(id)===c){ NET.conns.delete(id); const pl=NET.players.get(id); netRemovePlayer(id); netBroadcast({t:'bye',id},null); if(pl) netFeed('🚪 '+pl.name+' est parti'); netRender(); } });
   c.on('error',()=>{});
 }
-function netSendWorld(c,id){
-  const g=G, ch2=[]; g.changes.forEach(q=>q.m.forEach((v,i)=>ch2.push(q.cx*16+(i&15),i>>8,q.cz*16+((i>>4)&15),v)));
-  const players=[{id:'h',name:S.name,av:S.avatar}]; NET.players.forEach((p,k)=>{ if(k!==id) players.push({id:k,name:p.name,av:p.av}); });
+function netSendGo(c){
+  const gm=NET.game; if(!gm) return;
+  c.send({t:'go',g:gm.g,seed:gm.seed,r:gm.r,o:gm.o});
+  netWelcomeTo(c);
+  const g=G; if(gm.g!=='mc'||!g||g.id!=='mc'||!g.changes) return;
+  const ch2=[]; g.changes.forEach(q=>q.m.forEach((v,i)=>ch2.push(q.cx*16+(i&15),i>>8,q.cz*16+((i>>4)&15),v)));
   const pos=P.y>MCH+2||P.y<-5?g.spawn:[+P.x.toFixed(2),+P.y.toFixed(2),+P.z.toFixed(2)];
-  c.send({t:'welcome',id,world:{seed:g.seed,lt:Array.from(g.looted||[]).slice(0,5000),time:+(g.dayT||0).toFixed(4)},pos,players,n:ch2.length});
+  c.send({t:'mcw',world:{seed:g.seed,lt:Array.from(g.looted||[]).slice(0,5000),time:+(g.dayT||0).toFixed(4)},pos,n:ch2.length});
   for(let i=0;i<ch2.length;i+=4000) c.send({t:'ch',d:ch2.slice(i,i+4000)});
-  c.send({t:'ready'});
+  c.send({t:'mcr'});
 }
 /* ---------- rejoindre ---------- */
 async function netJoin(raw){
@@ -5199,7 +5211,7 @@ async function netJoin(raw){
     NET.peer=p;
     const c=p.connect(NET_PREFIX+code,{reliable:true,serialization:'json'}); NET.host=c;
     NET.jt=setTimeout(()=>{ if(NET.role==='joining'&&tok===NET.tok) netFail({type:'connect'}); },25000);
-    c.on('open',()=>{ if(NET.host===c){ netStatus('⏳ Chargement du monde de ton copain…'); c.send({t:'hello',v:NET_VER,name:S.name,av:S.avatar}); } });
+    c.on('open',()=>{ if(NET.host===c){ netStatus('⏳ Connexion à ton copain…'); c.send({t:'hello',v:NET_VER,name:S.name,av:S.avatar}); } });
     c.on('data',d=>{ if(NET.host===c){ try{ netGuestMsg(d); }catch(e){ console.warn(e); } } });
     c.on('close',()=>{ if(NET.host!==c) return; if(NET.role==='joining') netFail({type:'connect'}); else netLost('📴 La partie en ligne est terminée'); });
     c.on('error',()=>{});
@@ -5207,35 +5219,55 @@ async function netJoin(raw){
 }
 function netGuestMsg(d){
   if(!d||typeof d!=='object') return; const t=d.t;
-  if(t==='welcome'){ const w=d.world||{}; if(!Number.isInteger(w.seed)) return netFail({type:'old'});
-    NET.myId=String(d.id);
-    NET.wbuf={seed:w.seed,lt:Array.isArray(w.lt)?w.lt.filter(k=>typeof k==='string'):[],time:typeof w.time==='number'&&isFinite(w.time)?w.time:0.3,ch2:[]};
-    NET.spawn=Array.isArray(d.pos)&&d.pos.length===3&&d.pos.every(Number.isFinite)?[d.pos[0]+1.2,d.pos[1]+0.3,d.pos[2]+0.6]:null;
+  if(t==='welcome'){ NET.myId=String(d.id);
     if(Array.isArray(d.players)) for(const p of d.players) if(p&&typeof p.id==='string'&&p.id!==NET.myId) netAddPlayer(p.id,p.name,p.av);
     return; }
+  if(t==='ready'){ if(NET.role!=='joining') return; clearTimeout(NET.jt);
+    NET.role='guest'; NET.busy=false; NET.msg=''; netClosePanel();
+    const h=NET.players.get('h'), hn=h?h.name:'ton copain';
+    $('hud').classList.toggle('net',mode==='game'); banner('👥 Tu as rejoint la partie de '+hn+' !');
+    netFeed('🟢 '+hn+' choisit le jeu : tu le suis automatiquement'); netBadge(); return; }
+  if(t==='go'){ if(typeof d.g!=='string'||!Number.isInteger(d.r)) return;
+    if(!GAMES[d.g]){ netFeed('⚠️ Ce jeu n\'existe pas encore chez toi : ferme et rouvre Blocs Mahé.'); return; }
+    NET.game={g:d.g,seed:Number.isInteger(d.seed)?d.seed:0,r:d.r,o:netCleanO(d.o)}; NET.wait={};
+    if(d.g==='mc'){ NET.wbuf=null; return; }
+    netFollow(); return; }
+  if(t==='mcw'){ const w=d.world||{}; if(!Number.isInteger(w.seed)) return;
+    NET.wbuf={seed:w.seed,lt:Array.isArray(w.lt)?w.lt.filter(k=>typeof k==='string'):[],time:typeof w.time==='number'&&isFinite(w.time)?w.time:0.3,ch2:[]};
+    NET.spawn=Array.isArray(d.pos)&&d.pos.length===3&&d.pos.every(Number.isFinite)?[d.pos[0]+1.2,d.pos[1]+0.3,d.pos[2]+0.6]:null; return; }
   if(t==='ch'){ if(NET.wbuf&&Array.isArray(d.d)) for(const v of d.d) NET.wbuf.ch2.push(v); return; }
-  if(t==='ready'){ if(!NET.wbuf) return; clearTimeout(NET.jt);
-    NET.world=NET.wbuf; NET.wbuf=null; NET.role='guest'; NET.busy=false; NET.msg=''; netClosePanel();
-    NET.starting=true; try{ startGame('mc'); } finally{ NET.starting=false; NET.world=null; }
-    banner('👥 Tu as rejoint la partie '+NET.code+' !'); netFeed('🟢 Tu joues dans le monde de ton copain'); return; }
+  if(t==='mcr'){ if(!NET.wbuf||!NET.game||NET.game.g!=='mc') return; NET.world=NET.wbuf; NET.wbuf=null; try{ netFollow(); } finally{ NET.world=null; } return; }
+  if(t==='opt'){ if(NET.game&&d.r===NET.game.r){ const o=netCleanO(d.o); Object.assign(NET.game.o,o); netWaitFire(o); } return; }
+  if(t==='home'){ NET.game=null; NET.wait={}; const h=NET.players.get('h');
+    if(mode==='game'&&G&&G.netR){ exitGame(); banner('🏠 '+(h?h.name:'Ton copain')+' choisit un autre jeu…'); } else netBadge(); return; }
   if(t==='full'||t==='old') return netFail({type:t});
   if(t==='end') return netLost('📴 Ton copain a fermé la partie');
   if(t==='join'&&typeof d.id==='string'){ if(d.id===NET.myId) return; const p=netAddPlayer(d.id,d.name,d.av); netFeed('👋 '+p.name+' a rejoint la partie'); sfx('cp'); netRender(); return; }
   if(t==='bye'&&typeof d.id==='string'){ const p=NET.players.get(d.id); netRemovePlayer(d.id); if(p) netFeed('🚪 '+p.name+' est parti'); netRender(); return; }
-  if(t==='d'){ if(typeof d.v==='number'&&isFinite(d.v)&&G&&G.id==='mc') G.dayT=((d.v%1)+1)%1; return; }
+  if(t==='d'){ if(typeof d.v==='number'&&isFinite(d.v)&&G&&G.id==='mc'&&G.netR) G.dayT=((d.v%1)+1)%1; return; }
   if(NET.role!=='guest') return;
   netHandle(typeof d.id==='string'?d.id:null,d);
 }
 /* ---------- messages de jeu ---------- */
+function netOkState(s){ return Array.isArray(s)&&s.length>=6&&s.length<=24&&s.slice(0,6).every(Number.isFinite)&&s.every(v=>typeof v==='number'?isFinite(v):typeof v==='string'&&v.length<=12); }
+function netCleanTxt(t,n){ return String(t).replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,n); }
 function netHandle(from,d){
   const t=d.t, host=NET.role==='host';
-  if(t==='s'){ if(Array.isArray(d.s)&&d.s.length>=6&&d.s.length<=12&&d.s.slice(0,6).every(Number.isFinite)){ netState(from,d.s); if(host) netBroadcast({t:'s',id:from,s:d.s},from); } }
+  if(t==='s'){ if(netOkState(d.s)&&Number.isInteger(d.k)){ netState(from,d.s,d.k); if(host) netBroadcast({t:'s',id:from,s:d.s,k:d.k},from); } }
   else if(t==='e'){ if(Array.isArray(d.d)&&d.d.length<=16000){ netApplyEdits(d.d); if(host) netBroadcast({t:'e',d:d.d},from); } }
   else if(t==='c'){ if(Number.isInteger(d.m)&&d.m>=0&&d.m<NET_CHAT.length){ netChat(from,d.m); if(host) netBroadcast({t:'c',id:from,m:d.m},from); } }
+  else if(t==='sc'){ if(typeof d.v==='string'&&d.v.length<=40){ const p=NET.players.get(from); if(p) p.sc=netCleanTxt(d.v,30); if(host) netBroadcast({t:'sc',id:from,v:d.v},from); } }
+  else if(t==='ev'){ if(typeof d.m==='string'&&d.m.length<=120){ netFeed(netCleanTxt(d.m,90)); if(host) netBroadcast({t:'ev',id:from,m:d.m},from); } }
+  else if(t==='x'){ if(!Number.isInteger(d.r)||!d.m||typeof d.m!=='object'||JSON.stringify(d.m).length>3000) return;
+    const to=typeof d.to==='string'?d.to:'';
+    if(host){ if(!to) netBroadcast({t:'x',id:from,r:d.r,m:d.m},from); else if(to!=='h'){ const c=NET.conns.get(to); if(c){ try{ c.send({t:'x',id:from,r:d.r,m:d.m,to}); }catch(e){} } } }
+    if((!to||to===NET.myId)&&G&&G.netR===d.r&&G.netMsg){ try{ G.netMsg(from,d.m); }catch(e){ console.warn(e); } } }
+  else if(t==='sug'&&host){ if(typeof d.g==='string'&&GAMES[d.g]){ const p=NET.players.get(from), gl=GAME_LIST.find(x=>x.id===d.g); netFeed('💡 '+(p?p.name:'Copain')+' propose : '+(gl?gl.ic+' '+gl.t:d.g)); sfx('cp'); } }
+  else if(t==='sync'&&host){ const c=NET.conns.get(from); if(c&&NET.game) netSendGo(c); }
 }
-function netState(id,s){ const p=NET.players.get(id); if(p) p.s=s; }
+function netState(id,s,k){ const p=NET.players.get(id); if(p){ p.s=s; p.k=k; p.st=performance.now(); } }
 function netApplyEdits(d){
-  const g=G; if(!g||g.id!=='mc'||!g.changes) return;
+  const g=G; if(!g||g.id!=='mc'||!g.changes||!g.netR) return;
   NET.applying=true;
   try{ for(let i=0;i+3<d.length;i+=4){ const x=d[i], y=d[i+1], z=d[i+2], v=d[i+3];
       if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||y<0||y>=MCH||!(v===0||MB[v])) continue;
@@ -5252,11 +5284,21 @@ function netMyState(g){
 }
 function netTick(g,dt){
   if(NET.role!=='host'&&NET.role!=='guest') return;
-  NET.sT-=dt; NET.eT-=dt; NET.dT-=dt;
-  if(NET.sT<=0){ NET.sT=0.1; netSend({t:'s',s:netMyState(g)}); }
+  const r=g.netR||0; NET.sT-=dt; NET.scT-=dt; NET.lt+=dt;
+  if(r&&NET.sT<=0){ NET.sT=0.1; let st; try{ st=g.netState?g.netState():netDefState(g); }catch(e){ st=null; } if(st&&netOkState(st)) netSend({t:'s',k:r,s:st}); }
+  if(r&&NET.scT<=0){ NET.scT=1; const v=netScoreOf(g); if(v!==NET.scV){ NET.scV=v; netSend({t:'sc',v}); } }
+  if(r&&g.netTick) g.netTick(dt);
+  const now=performance.now(), pause=!r||!!(g.netPause&&g.netPause());
+  NET.players.forEach(p=>{ const on=!pause&&p.k===r&&p.s&&now-p.st<2500;
+    if(!on){ if(p.A) p.A.root.visible=false; if(p.veh) p.veh.g.visible=false; return; }
+    if(g.netDraw) g.netDraw(p,dt); else netDrawDefault(g,p,dt);
+    if(p.A) p.A.root.visible=!(typeof p.s[5]==='number'&&(p.s[5]&16)); if(p.veh) p.veh.g.visible=true; });
+  NET.bT-=dt; if(NET.bT<=0){ NET.bT=0.5; netBoard(g); }
+}
+function netTickMC(g,dt){
+  NET.eT-=dt; NET.dT-=dt;
   if(NET.eT<=0&&NET.out.length){ NET.eT=0.1; netSend({t:'e',d:NET.out.splice(0,4000)}); }
   if(NET.role==='host'&&NET.dT<=0){ NET.dT=5; netBroadcast({t:'d',v:+(g.dayT||0).toFixed(4)},null); }
-  NET.players.forEach(p=>netDrawPlayer(g,p,dt));
 }
 function netDrawPlayer(g,p,dt){
   const s=p.s; if(!s) return;
@@ -5274,17 +5316,17 @@ function netGuestSave(own){ const w=NET.world; return {seed:w.seed,ch2:w.ch2,lt:
 /* ---------- branchement dans le Monde de Blocs ---------- */
 { const M=GAMES.mc;
   const st=M.start; M.start=function(){ this.netGuest=!!NET.world; const r=st.apply(this,arguments); $('hud').classList.toggle('net',NET.role==='host'||NET.role==='guest'); netBadge(); return r; };
-  const up=M.update; M.update=function(dt){ const r=up.call(this,dt); netTick(this,dt); return r; };
-  const sp=M.stop; M.stop=function(){ NET.players.forEach(p=>netFreeP(p)); if(!NET.starting&&(NET.role==='host'||NET.role==='guest'||NET.role==='joining')) netLeave(); return sp.apply(this,arguments); };
+  M.netTick=function(dt){ netTickMC(this,dt); }; M.netState=function(){ return netMyState(this); }; M.netDraw=function(p,dt){ netDrawPlayer(this,p,dt); };
+  M.netScore=function(){ return this.mode==='creative'?'🎨 Créatif':'❤️ '+Math.ceil(this.hp/2); };
   const sv=M.saveMC; M.saveMC=function(){ if(this.netGuest){ save(); return; } return sv.apply(this,arguments); };
-  const sb=M.setB; M.setB=function(x,y,z,id){ const r=sb.call(this,x,y,z,id); if((NET.role==='host'||NET.role==='guest')&&!NET.applying&&this===G&&NET.out.length<40000) NET.out.push(x,y,z,id); return r; };
+  const sb=M.setB; M.setB=function(x,y,z,id){ const r=sb.call(this,x,y,z,id); if((NET.role==='host'||NET.role==='guest')&&this.netR&&!NET.applying&&this===G&&NET.out.length<40000) NET.out.push(x,y,z,id); return r; };
 }
 /* ---------- fenêtre « Jouer avec des copains » ---------- */
 function netOpenPanel(){ $('netPanel').classList.add('on'); netRender(); }
 function netClosePanel(){ $('netPanel').classList.remove('on'); }
 function netCard(p){
   const b=el('button','netcard'), ic=el('span','ic'), tx=el('span','tx'), bb=el('b'), sm=el('span'), go=el('span','go');
-  ic.textContent='👥'; bb.textContent='Jouer avec des copains'; sm.textContent=NET.role==='host'||NET.role==='guest'?'🟢 En ligne · code '+NET.code:'Monde de Blocs à plusieurs, chacun sur son téléphone'; go.textContent='▶';
+  ic.textContent='👥'; bb.textContent='Jouer avec des copains'; sm.textContent=NET.role==='host'||NET.role==='guest'?'🟢 En ligne · code '+NET.code+' · '+(NET.players.size+1)+' joueur'+(NET.players.size?'s':'')+(NET.role==='guest'?' · '+netWhat():''):'Tous les jeux à plusieurs, chacun sur son téléphone'; go.textContent='▶';
   tx.appendChild(bb); tx.appendChild(sm); b.appendChild(ic); b.appendChild(tx); b.appendChild(go);
   b.addEventListener('click',()=>{ sfx('click'); netOpenPanel(); }); p.appendChild(b);
 }
@@ -5297,22 +5339,27 @@ function netRender(){
   const h4=txt=>{ const q=el('h4'); q.textContent=txt; body.appendChild(q); };
   if(NET.busy||NET.role==='joining'){ para(NET.msg||'⏳ Connexion…','net-st'); btn('Annuler','gray',()=>{ netLeave(true); NET.err=''; netRender(); }); return; }
   if(NET.role==='host'||NET.role==='guest'){
-    para(NET.role==='host'?'Ta partie est ouverte ! Donne ce code à tes copains :':'Tu joues dans le monde de ton copain. Code de la partie :');
+    const hp=NET.players.get('h'), hn=NET.role==='host'?S.name:(hp?hp.name:'ton copain'), gl=NET.game?GAME_LIST.find(x=>x.id===NET.game.g):null;
+    para(NET.role==='host'?'Ta partie est ouverte ! Donne ce code à tes copains :':'Tu es dans la partie de '+hn+'. Code :');
     const cd=el('div','net-code'); cd.textContent=NET.code; body.appendChild(cd);
-    if(NET.role==='host') para('Sur leur téléphone : Blocs Mahé → 👥 Jouer avec des copains → tape le code → Rejoindre. Garde le jeu ouvert pendant qu\'ils jouent.','net-small');
+    if(NET.role==='host') para('Sur leur téléphone : Blocs Mahé → 👥 Jouer avec des copains → tape le code → Rejoindre. Ensuite, choisis n\'importe quel jeu : tes copains te suivent automatiquement.','net-small');
+    else para('C\'est '+hn+' qui choisit le jeu, tu le suis automatiquement. Touche un jeu de l\'accueil pour le lui proposer !','net-small');
+    para(gl?'🎮 Jeu en cours : '+gl.ic+' '+gl.t:'🏠 Pas encore de jeu choisi','net-st2');
     h4('Joueurs ('+(NET.players.size+1)+'/'+NET_MAX+')');
-    const row=(name,tag)=>{ const r=el('div','mod'), i=el('span','em'), tx=el('div','tx'), bb=el('b'), sp=el('span'); i.textContent='🧑'; bb.textContent=name; sp.textContent=tag; tx.appendChild(bb); tx.appendChild(sp); r.appendChild(i); r.appendChild(tx); body.appendChild(r); };
-    row(S.name+' (toi)',NET.role==='host'?'👑 Hôte':'Invité');
-    NET.players.forEach((p,id)=>row(p.name,id==='h'?'👑 Hôte':'Invité'));
-    if(NET.role==='guest') para('Ce que tu construis reste dans le monde de ton copain. Tes pièces et ton monde à toi ne changent pas.','net-small');
-    if(mode==='game'&&G&&G.id==='mc') btn('🎮 Retour au jeu','',netClosePanel);
-    else btn('🎮 Retourner dans la partie','',()=>{ netClosePanel(); if(NET.role==='host') startGame('mc'); });
-    btn('🚪 Quitter la partie en ligne','red',()=>{ const g=NET.role==='guest'; netLeave(); netClosePanel(); if(g&&mode==='game'&&G&&G.id==='mc') exitGame(); });
+    const now=performance.now(), r=NET.game?NET.game.r:-1;
+    const row=(name,tag,sc,av)=>{ const q=el('div','mod'), i=el('span','em'), tx=el('div','tx'), bb=el('b'), sp=el('span'); i.textContent=av; bb.textContent=name; sp.textContent=tag+(sc?' · '+sc:''); tx.appendChild(bb); tx.appendChild(sp); q.appendChild(i); q.appendChild(tx); body.appendChild(q); };
+    const me=mode==='game'&&G&&G.netR&&G.netR===r;
+    row(S.name+' (toi)',(NET.role==='host'?'👑 Hôte':'Invité')+(me?' · 🎮 en jeu':' · 🏠 accueil'),me?netScoreOf(G):'',me?'🎮':'🏠');
+    NET.players.forEach((q,id)=>{ const inG=q.k===r&&now-q.st<3000; row(q.name,(id==='h'?'👑 Hôte':'Invité')+(inG?' · 🎮 en jeu':' · 🏠 accueil'),inG?q.sc:'',inG?'🎮':'🏠'); });
+    if(mode==='game'&&G) btn('🎮 Retour au jeu','',netClosePanel);
+    else if(NET.role==='guest'&&NET.game) btn('🎮 Rejoindre '+(gl?gl.t:'le jeu'),'',()=>{ netClosePanel(); netSync(); });
+    else if(NET.role==='host') btn('🎮 Choisir un jeu','',()=>{ netClosePanel(); switchTab('play'); });
+    btn(NET.role==='host'?'🚪 Fermer la partie en ligne':'🚪 Quitter la partie en ligne','red',()=>{ const g=NET.role==='guest'; netLeave(); netClosePanel(); if(g&&mode==='game'&&G&&G.id==='mc'&&G.netGuest) exitGame(); });
     return;
   }
   if(NET.err) para('⚠️ '+NET.err,'net-err');
   h4('🌍 Créer une partie');
-  para(mode==='game'&&G&&G.id==='mc'?'Ouvre ce monde à tes copains : tu reçois un code à leur donner.':'Ouvre ton Monde de Blocs à tes copains : tu reçois un code à leur donner.','net-small');
+  para('Tu reçois un code à donner à tes copains. Ensuite, choisis n\'importe quel jeu : ils arrivent avec toi, dans le même monde.','net-small');
   btn('🌍 Créer une partie','',()=>netHost());
   h4('🚪 Rejoindre un copain');
   para('Tape le code que ton copain voit sur son écran.','net-small');
@@ -5321,7 +5368,7 @@ function netRender(){
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter') netJoin(inp.value); });
   const jb=el('button','net-btn'); jb.textContent='Rejoindre'; jb.addEventListener('click',()=>{ sfx('click'); netJoin(inp.value); });
   r.appendChild(inp); r.appendChild(jb); body.appendChild(r);
-  para('Il faut Internet sur chaque téléphone, jusqu\'à '+NET_MAX+' joueurs. Le jeu en ligne marche dans l\'appli Blocs Mahé (le lien GitHub), pas dans l\'aperçu de Claude.','net-small');
+  para('Il faut Internet sur chaque téléphone, jusqu\'à '+NET_MAX+' joueurs. Marche dans tous les jeux. Le jeu en ligne marche dans l\'appli Blocs Mahé (le lien GitHub), pas dans l\'aperçu de Claude.','net-small');
 }
 $('mcNet').addEventListener('click',()=>{ sfx('click'); netOpenPanel(); });
 $('netChatB').addEventListener('click',()=>{ sfx('click'); const c=$('netChat'); c.classList.toggle('on'); });
@@ -6710,14 +6757,14 @@ function rbPadMesh(){
     e.alive=false; e.hp=0;
     burst(this.scene,e.x,e.y+1,e.z,e.col||'#ffffff',16,6); confetti(this.scene,e.x,e.y+1.2,e.z); sfx('poof');
     if(!e.isPlayer){ e.A.root.visible=false; if(e.w) this.dropItem({kind:'w',w:e.w.w,r:e.w.r},e.x,e.z); if(Math.random()<0.6) this.dropItem({kind:'shield'},e.x+0.8,e.z); }
-    const nm=q=>q.isPlayer?S.name:(q.ally?'🤝 ':'🤖 ')+q.name;
+    const nm=q=>q.isPlayer?S.name:(q.net?'👤 ':q.ally?'🤝 ':'🤖 ')+q.name;
     this.feed(by&&by!==e?nm(by)+' a éliminé '+nm(e):nm(e)+' a été emporté par la tempête');
     if(by===this.pEnt&&!e.isPlayer){ this.kills++; this.streak=this.time-this.lastKill<6?this.streak+1:1; this.lastKill=this.time;
       banner(this.streak>=3?'🔥 '+this.streak+' éliminations d\'affilée !':this.streak===2?'⚡ Double élimination !':'🎯 Éliminé : '+e.name+' !'); if(this.streak>=2) sfx('cp'); }
     else if(by&&by.ally&&!e.isPlayer) this.allyKills++;
     if(e.isPlayer) return this.end(false,by);
     if(e.ally){ banner('💔 '+e.name+' est éliminé… continue, tu peux gagner !'); sfx('nope'); }
-    if(this.pEnt.alive&&this.bots.every(b=>!b.alive||b.team===0)) this.end(true);
+    if(this.pEnt.alive&&this.bots.every(b=>!b.alive||b.team===0)&&!(this.netFoes&&netLive()&&this.netFoes().length)) this.end(true);
   };
   R.end=function(win,by){
     if(this.over) return; this.over=true; this.firing=false;
@@ -6731,7 +6778,7 @@ function rbPadMesh(){
     const M=RB_MODES[this.mode]||RB_MODES.classic, st=[['Place',(win?'1re':place+'e')+' / 16'],['Éliminations',this.kills+(rec?' 🏅 record !':'')],['Dégâts',Math.round(this.dealt)],['Pièces gagnées','+'+coins]];
     if(this.ally) st.splice(2,0,['🤝 '+this.ally.name,this.allyKills+' élim.']);
     showResult(win?{icon:'👑',title:this.ally?'Champions de l\'île !':'Champion de l\'île !',sub:(this.ally?'Toi et '+this.ally.name+', derniers debout':'Tu es le dernier debout')+', bravo '+S.name+' ! ('+M.ic+' '+M.t+')',stats:st}
-      :{icon:'🎨',title:'Éliminé !',sub:by?'Repeint par 🤖 '+by.name+'.':'La tempête t\'a rattrapé.',stats:st});
+      :{icon:'🎨',title:'Éliminé !',sub:by?'Repeint par '+(by.net?'👤 ':'🤖 ')+by.name+'.':'La tempête t\'a rattrapé.',stats:st});
   };
   R.stop=function(){
     if(this.kart&&PA) PA.root.remove(this.kart.g); this.kart=null; engineStop(true);
@@ -6764,7 +6811,8 @@ function rbPadMesh(){
       const steps=Math.max(1,Math.ceil(Math.hypot(p.vx,p.vy,p.vz)*dt/0.4)), h=dt/steps;
       for(let s=0;s<steps&&!hit;s++){ p.x+=p.vx*h; p.y+=p.vy*h; p.z+=p.vz*h;
         if(p.y<0.03){ hit={t:'g'}; break; }
-        for(const e of this.ents) if(e!==p.owner&&e.alive&&e.team!==ot&&p.x>e.x-0.45&&p.x<e.x+0.45&&p.z>e.z-0.45&&p.z<e.z+0.45&&p.y>e.y&&p.y<e.y+1.9){ hit={t:'e',e}; break; }
+        if(!p.fx) for(const e of this.ents) if(e!==p.owner&&e.alive&&e.team!==ot&&p.x>e.x-0.45&&p.x<e.x+0.45&&p.z>e.z-0.45&&p.z<e.z+0.45&&p.y>e.y&&p.y<e.y+1.9){ hit={t:'e',e}; break; }
+        if(!hit&&p.owner===this.pEnt&&this.netHitTest&&netLive()){ const q=this.netHitTest(p.x,p.y,p.z); if(q) hit={t:'n',q}; }
         if(hit) break;
         for(const b of this.query(p.x-0.1,p.x+0.1,p.y-0.1,p.y+0.1,p.z-0.1,p.z+0.1)){ if(b===this.ground) continue;
           if(b.ramp){ const sy=b.ramp(p.x,p.z); if(p.y<sy+0.15&&p.y>sy-0.35){ hit={t:'s',b}; break; } continue; }
@@ -8536,10 +8584,239 @@ GAME_EXTRA.push({id:'beast',ic:'🐾',t:'Bestioles Magiques',d:'Explore l\'île,
   best:()=>S.beast.team&&S.beast.team.length?'📖 '+S.beast.caught.length+'/19'+(S.beast.badge?' · 🏅':''):'Nouveau !'});
 
 /* =========================================================
+   25. Jeu en ligne dans tous les jeux
+   L'hôte crée une partie depuis l'accueil puis choisit n'importe
+   quel jeu : les invités le suivent automatiquement. Le monde est
+   le même chez tout le monde (graine commune : Math.random est
+   remplacé par un générateur à graine pendant start() et les
+   constructions), chacun voit l'avatar ou le héros des copains,
+   un petit tableau des scores, les messages rapides et les fins
+   de partie. Un nouveau jeu en profite sans rien faire ; il peut
+   ajouter : netScore() (texte court), netState()/netDraw(p,dt)
+   (affichage propre, ex. voitures), netMsg(de,m) + netMsg(m,à)
+   (messages de jeu), netPause()/netHide() (scène à part),
+   netWelcome(conn) (état initial envoyé par l'hôte), et utiliser
+   netShare/netGet/netWait pour les choix faits par l'hôte.
+   ========================================================= */
+function netOn(){ return NET.role==='host'||NET.role==='guest'; }
+function netLive(){ return netOn()&&!!G&&!!G.netR&&!!NET.game&&NET.game.r===G.netR; }
+function netIsGuest(){ return NET.role==='guest'&&netLive(); }
+function netHostName(){ if(NET.role==='host') return S.name; const h=NET.players.get('h'); return h?h.name:'ton copain'; }
+function netWhat(){ const gl=NET.game?GAME_LIST.find(x=>x.id===NET.game.g):null; return gl?gl.ic+' '+gl.t:'à l\'accueil'; }
+function netCleanO(o){ const r={}; if(!o||typeof o!=='object') return r; let n=0;
+  for(const k of Object.keys(o)){ if(n>=16||!/^[a-zA-Z]{1,10}$/.test(k)) continue; const v=o[k];
+    if(typeof v==='number'&&isFinite(v)) r[k]=v; else if(typeof v==='string'&&v.length<=20) r[k]=v; else if(typeof v==='boolean') r[k]=v; else continue; n++; }
+  return r; }
+/* hasard commun : même graine + même étape = même monde chez tout le monde */
+function netSeeded(fn,salt){ const g=G; if(!g||!g.netR||!g.netSeed) return fn();
+  let h=(g.netSeed^0x5bd1e995)>>>0; const t=String(salt); for(let i=0;i<t.length;i++) h=Math.imul(h^t.charCodeAt(i),16777619)>>>0;
+  const old=Math.random; Math.random=mulberry32(h); try{ return fn(); } finally{ Math.random=old; } }
+/* choix faits par l'hôte (monde, niveau, mode…) */
+function netShare(k,v){ if(NET.role!=='host'||!netLive()) return; NET.game.o[k]=v; const o={}; o[k]=v; netBroadcast({t:'opt',r:NET.game.r,o},null); }
+function netGet(k,d){ return netIsGuest()&&NET.game.o[k]!==undefined?NET.game.o[k]:d; }
+function netWait(k,fn,txt){ if(!netIsGuest()) return false; const v=NET.game.o[k];
+  if(v!==undefined){ closeChoice(); fn(v); return true; }
+  NET.wait[k]=fn;
+  openChoice({title:'⏳ '+(txt||'En attente…'),sub:netHostName()+' choisit pour tout le monde. Ça arrive !',close:false,items:[]});
+  return true; }
+function netWaitFire(o){ for(const k of Object.keys(o)){ const fn=NET.wait[k]; if(fn&&G&&G.netR){ delete NET.wait[k]; closeChoice(); try{ fn(o[k]); }catch(e){ console.warn(e); } } } }
+/* messages propres à un jeu (to = id d'un joueur, sinon tout le monde) */
+function netMsg(m,to){ if(!netLive()) return; const d={t:'x',r:G.netR,m}; if(to) d.to=to;
+  if(NET.role==='host'){ d.id='h'; if(!to) netBroadcast(d,null); else { const c=NET.conns.get(to); if(c){ try{ c.send(d); }catch(e){} } } }
+  else netSend(d); }
+function netPeers(){ const out=[], g=G, now=performance.now(); if(!netLive()) return out;
+  NET.players.forEach((p,id)=>{ if(p.k===g.netR&&p.s&&now-p.st<2500) out.push(p); }); return out; }
+function netEvent(m){ if(!netOn()) return; netSend({t:'ev',m:netCleanTxt(m,90)}); }
+/* suivre l'hôte */
+function netFollow(){ const gm=NET.game; if(!gm||!GAMES[gm.g]) return; netClosePanel(); $('result').classList.remove('on');
+  NET.starting=true; try{ startGame(gm.g); } finally{ NET.starting=false; } }
+function netSync(){ if(NET.role!=='guest') return; if(!NET.game){ toast('⏳ '+netHostName()+' n\'a pas encore choisi de jeu'); return; } netSend({t:'sync'}); toast('⏳ On te ramène dans la partie…'); }
+function netSuggest(id){ const gl=GAME_LIST.find(x=>x.id===id);
+  if(NET.game&&NET.game.g===id){ netSync(); return; }
+  netSend({t:'sug',g:id}); toast('💡 Proposé à '+netHostName()+' : '+(gl?gl.t:id)); }
+function netAdopt(){ if(!G) return; NET.game={g:G.id,seed:G.netSeed||0,r:++NET.round,o:{}}; NET.wait={}; G.netR=NET.game.r; $('hud').classList.add('net'); }
+/* lancement / sortie (appelés par startGame / exitGame) */
+function netPreStart(id){
+  const g=G; g.netR=0; g.netSeed=0;
+  if(NET.role==='host'){ NET.game={g:id,seed:1+((Math.random()*2147480000)|0),r:++NET.round,o:{}}; NET.wait={}; }
+  else if(NET.role==='guest'){ if(!NET.game||NET.game.g!==id){ $('hud').classList.add('net'); return; } NET.wait={}; }
+  else { $('hud').classList.remove('net'); return; }
+  g.netR=NET.game.r; g.netSeed=NET.game.seed; NET.sT=0; NET.scT=0.5; NET.scV=''; NET.bT=0; NET.lx=P.x; NET.lz=P.z; NET.lt=0;
+  $('hud').classList.add('net');
+}
+function netPostStart(){
+  const g=G; if(!g||NET.role!=='host'||!g.netR) return;
+  NET.conns.forEach(c=>{ try{ netSendGo(c); }catch(e){} });
+  const h=GAME_LIST.find(x=>x.id===g.id); if(NET.conns.size) netFeed('🎮 Tes copains arrivent dans '+(h?h.t:'le jeu'));
+}
+function netWelcomeTo(c){ const g=G; if(g&&g.netR&&NET.game&&g.netR===NET.game.r&&g.netWelcome){ try{ g.netWelcome(c); }catch(e){ console.warn(e); } } }
+function netPreExit(){
+  NET.players.forEach(p=>netFreeP(p));
+  const g=G; if(!g||!g.netR) return;
+  if(NET.role==='host'&&!NET.sw&&NET.game&&NET.game.r===g.netR){ NET.game=null; NET.wait={}; netBroadcast({t:'home'},null); }
+  NET.wait={}; const b=$('netBoard'); if(b){ b.classList.remove('on'); b.innerHTML=''; b._h=''; }
+}
+/* état envoyé 10 fois par seconde : position, direction, vitesse, drapeaux, héros, taille */
+function netDefState(g){
+  const sp=Math.min(30,Math.hypot(P.x-NET.lx,P.z-NET.lz)/Math.max(0.05,NET.lt)); NET.lx=P.x; NET.lz=P.z; NET.lt=0;
+  const hid=!PA||!PA.root.visible||!!(g.netHide&&g.netHide()), hi=g.hero?HEROES.indexOf(g.hero)+1:0;
+  return [netR2(P.x),netR2(P.y),netR2(P.z),netR2(P.yaw),netR2(sp),(P.fly?1:0)|(P.onGround?2:0)|(PA&&PA.sit?4:0)|(PA&&PA.swing>0?8:0)|(hid?16:0),hi,netR2(PA?PA.root.scale.x:1)];
+}
+function netDrawDefault(g,p,dt){
+  const s=p.s, hi=typeof s[6]==='number'?s[6]|0:0, h=hi>0&&hi<=HEROES.length?HEROES[hi-1]:null, look=h?h.id:'av';
+  if(p.A&&p.look!==look){ if(p.A.root.parent) p.A.root.parent.remove(p.A.root); disposeAvatar(p.A); p.A=null; }
+  if(!p.A){ p.look=look; p.A=makeAvatar(h?h.av:p.av,p.name,{hand:g.id==='royale'}); g.scene.add(p.A.root); p.x=s[0]; p.y=s[1]; p.z=s[2]; p.yaw=s[3]; }
+  const k=Math.min(1,dt*12);
+  if(Math.hypot(p.x-s[0],p.y-s[1],p.z-s[2])>12){ p.x=s[0]; p.y=s[1]; p.z=s[2]; }
+  p.x=lerp(p.x,s[0],k); p.y=lerp(p.y,s[1],k); p.z=lerp(p.z,s[2],k); p.yaw=angLerp(p.yaw,s[3],k);
+  const A=p.A, sc=typeof s[7]==='number'&&s[7]>0.2&&s[7]<4?s[7]:1;
+  A.root.position.set(p.x,p.y,p.z); A.root.rotation.y=p.yaw; A.root.scale.setScalar(sc); A.sit=!!(s[5]&4); if((s[5]&8)&&!(A.swing>0)) A.swing=0.28;
+  animAvatar(A,dt,s[4],!!(s[5]&3));
+}
+function netScoreOf(g){ try{ const v=g.netScore?g.netScore():(g.earned?'🪙 '+g.earned:''); return netCleanTxt(v||'',30); }catch(e){ return ''; } }
+function netBoard(g){
+  const b=$('netBoard'); if(!b) return; const rows=netPeers().map(p=>[p.name,p.sc,0]);
+  if(!rows.length){ if(b._h){ b._h=''; b.innerHTML=''; b.classList.remove('on'); } return; }
+  rows.unshift([S.name,netScoreOf(g),1]); const key=JSON.stringify(rows); if(b._h===key) return; b._h=key; b.innerHTML='';
+  for(const [n,v,me] of rows){ const d=el('div',me?'me':''); d.textContent=(me?'⭐ ':'👤 ')+n+(v?' · '+v:''); b.appendChild(d); }
+  b.classList.add('on');
+}
+
+/* ---------- réglages propres à chaque jeu ---------- */
+{ const O=GAMES.obby, st=O.start, pw=O.pickWorld;
+  O.start=function(){ const w=netGet('w',null);
+    if(w!==null&&OBW[w|0]){ const old=S.ob.w; S.ob.w=w|0; OB_PICKED=true; try{ st.call(this); } finally{ S.ob.w=old; } }
+    else st.call(this);
+    netShare('w',this.w); };
+  O.pickWorld=function(){ if(netIsGuest()){ toast('🗺️ C\'est '+netHostName()+' qui choisit le monde'); return; } return pw.apply(this,arguments); };
+  O.netScore=function(){ return '🚩 '+this.cp+'/2 · ⭐ '+this.got; }; }
+{ const L=GAMES.plat, pw=L.pickWorld, bd=L.build;
+  L.pickWorld=function(){ if(netWait('wi',v=>this.build(clamp(v|0,0,PWORLDS.length-1)),'Le monde va être choisi…')) return; return pw.apply(this,arguments); };
+  L.build=function(wi){ netShare('wi',wi); return netSeeded(()=>bd.call(this,wi),'wi'); };
+  L.netScore=function(){ return this.ready?'⭐ '+this.nStars()+'/3 · 🪙 '+this.coinsGot:''; }; }
+{ const J=GAMES.jungle, pl=J.pickLevel, bd=J.build;
+  J.pickLevel=function(){ if(netWait('li',v=>this.build(clamp(v|0,0,JLV.length-1)),'Le niveau va être choisi…')) return; return pl.apply(this,arguments); };
+  J.build=function(li){ netShare('li',li); return netSeeded(()=>bd.call(this,li),'li'); };
+  J.netScore=function(){ return this.ready?'📦 '+this.crGot+'/'+this.crTot:''; }; }
+{ const T=GAMES.temple, bd=T.build;
+  T.build=function(){ return netSeeded(()=>bd.apply(this,arguments),'b'); };
+  T.netScore=function(){ return this.ready?'🏺 '+this.got+'/5':''; }; }
+{ const B=GAMES.beast, bd=B.build;
+  B.build=function(){ return netSeeded(()=>bd.apply(this,arguments),'b'); };
+  B.netScore=function(){ return '📖 '+S.beast.caught.length+'/'+BS_IDS.length; };
+  B.netPause=function(){ return !!this.inB; }; B.netHide=function(){ return !!this.inB; }; }
+{ const R=GAMES.royale, st=R.start, sm=R.setMode;
+  R.start=function(){ const r=st.apply(this,arguments); if(netIsGuest()){ closeChoice(); netWait('mode',k=>this.setMode(RB_MODES[k]?k:'classic'),'Le mode de jeu va être choisi…'); } return r; };
+  R.setMode=function(k){ if(!this.modeChosen) netShare('mode',RB_MODES[k]?k:'classic'); return sm.apply(this,arguments); };
+  R.netScore=function(){ return '🎯 '+this.kills+(this.pEnt&&this.pEnt.alive?'':' · 💀'); }; }
+GAMES.arena.netScore=function(){ return 'Vague '+Math.max(1,this.wave); };
+GAMES.island.netScore=function(){ return '💎 '+this.found+'/'+this.total; };
+GAMES.pirates.netScore=function(){ return '🗝️ '+this.keys+'/3'; };
+GAMES.eggs.netScore=function(){ return this.home?'🥚 '+this.home.slots.filter(s=>s.item).length:''; };
+GAMES.brainrot.netScore=function(){ return '💵 '+fmtCash(S.br.cash); };
+/* Turbo Bolides : voitures des copains, départ commun, classement avec les vrais joueurs */
+{ const R=GAMES.race, ch=R.chosen, up=R.update, pl=R.place, hd=R.hud;
+  R.chosen=function(h){ const r=ch.apply(this,arguments);
+    if(netLive()&&NET.players.size){ this.phase='wait'; this.waitT=0; banner('⏳ On attend tout le monde…'); netMsg({rdy:1}); }
+    return r; };
+  R.netGo=function(){ if(this.phase!=='wait') return; this.phase='count'; this.cnt=3.6; this.lastC=4; banner('Prêt ?'); };
+  R.netMsg=function(from,m){ if(m&&m.rdy) (this.rdy=this.rdy||new Set()).add(from); };
+  R.update=function(dt){
+    if(this.phase==='wait'){ this.waitT=(this.waitT||0)+dt; this.placeAIs(dt);
+      if(NET.role==='host'||!netLive()){ const ps=netPeers(), all=ps.every(p=>this.rdy&&this.rdy.has(p.id));
+        if(!netLive()||all||this.waitT>25){ netShare('go',1); this.netGo(); } }
+      else if(NET.game&&NET.game.o.go!==undefined) this.netGo();
+      return; }
+    return up.apply(this,arguments); };
+  R.place=function(){ let r=pl.call(this); if(this.done) return r; const p=this.prog();
+    for(const q of netPeers()){ const s=q.s; if(s.length>=14&&(s[13]>0||s[12]>p)) r++; } return r; };
+  R.hud=function(){ const r=hd.apply(this,arguments); if(netLive()&&this.phase!=='pick'&&this.phase!=='wait') setText('rcPos',this.place()+'/'+(6+netPeers().length)); return r; };
+  R.netState=function(){ const c=this.car, s=netDefState(this); s.push(netR2(c.x),netR2(c.y),netR2(c.z),netR2(c.h),this.prog(),this.done?this.fplace:0); return s; };
+  R.netDraw=function(p,dt){ const s=p.s, hi=typeof s[6]==='number'?s[6]|0:0, h=hi>0?HEROES[hi-1]:null;
+    const vk=h&&h.car&&s.length>=14?'rc'+h.id:'';
+    if(p.vk!==vk){ if(p.veh){ if(p.veh.g.parent) p.veh.g.parent.remove(p.veh.g); p.veh=null; } p.vk=vk; if(vk){ p.veh=rcCarMesh(h.car.c,h.car.s); this.scene.add(p.veh.g); p.cx=s[8]; p.cy=s[9]; p.cz=s[10]; p.ch=s[11]; } }
+    netDrawDefault(this,p,dt); if(p.A){ p.A.root.rotation.order='YXZ'; }
+    if(p.veh){ const k=Math.min(1,dt*12); if(Math.hypot(p.cx-s[8],p.cz-s[10])>12){ p.cx=s[8]; p.cy=s[9]; p.cz=s[10]; }
+      p.cx=lerp(p.cx,s[8],k); p.cy=lerp(p.cy,s[9],k); p.cz=lerp(p.cz,s[10],k); p.ch=angLerp(p.ch,s[11],k);
+      p.veh.g.position.set(p.cx,p.cy,p.cz); p.veh.g.rotation.set(0,p.ch,0); } };
+  R.netScore=function(){ const c=this.car; return this.done?'🏁 '+this.fplace+(this.fplace===1?'er':'e'):this.phase==='race'?'Tour '+clamp(c.lap,1,RC_LAPS)+'/'+RC_LAPS:'🚦 départ'; }; }
+/* Bâtisseur : on construit ensemble dans le monde de l'hôte */
+{ const B=GAMES.build, st=B.start, ab=B.addBlock, rb=B.removeBlock, pe=B.persist, ca=B.clearAll, ev=B.pickEnv;
+  B.start=function(){
+    if(netIsGuest()){ const ob=S.build, oe=S.buildEnv; S.build=[]; S.buildEnv=clamp(netGet('env',oe)|0,0,BENV.length-1); this.netGuest=true;
+      try{ return st.apply(this,arguments); } finally{ S.build=ob; S.buildEnv=oe; } }
+    const r=st.apply(this,arguments); netShare('env',S.buildEnv|0); return r; };
+  B.addBlock=function(x,y,z,ci,silent){ const ok=ab.apply(this,arguments); if(ok&&!this.netIn&&netLive()) (this.netOut=this.netOut||[]).push('a',x,y,z,ci); return ok; };
+  B.removeBlock=function(k){ const e=this.blocks.get(k); rb.apply(this,arguments); if(e&&!this.blocks.has(k)&&!this.netIn&&netLive()) (this.netOut=this.netOut||[]).push('d',e.x,e.y,e.z,0); };
+  B.persist=function(){ if(this.netGuest) return; return pe.apply(this,arguments); };
+  B.clearAll=function(){ if(netIsGuest()){ toast('🧹 Seul '+netHostName()+' peut tout effacer'); return; } const r=ca.apply(this,arguments); if(netLive()) netMsg({clr:1}); return r; };
+  if(ev) B.pickEnv=function(){ if(netIsGuest()){ toast('🎨 C\'est '+netHostName()+' qui choisit l\'ambiance'); return; } return ev.apply(this,arguments); };
+  B.netTick=function(){ const o=this.netOut; if(o&&o.length){ netMsg({b:o.splice(0,2500)}); } };
+  B.netWelcome=function(c){ const all=[]; for(const e of this.blocks.values()) all.push('a',e.x,e.y,e.z,e.ci);
+    for(let i=0;i<all.length;i+=2500) c.send({t:'x',id:'h',r:this.netR,m:{b:all.slice(i,i+2500)}}); };
+  B.netMsg=function(from,m){
+    if(m.clr){ this.netIn=true; try{ for(const e of this.blocks.values()) this.scene.remove(e.m); this.blocks.clear(); this.meshes=[]; this.pops=[]; if(!this.netGuest) this.persist(); } finally{ this.netIn=false; } return; }
+    const b=m.b; if(!Array.isArray(b)) return; this.netIn=true;
+    try{ for(let i=0;i+4<b.length;i+=5){ const t=b[i], x=b[i+1], y=b[i+2], z=b[i+3], ci=b[i+4];
+        if(![x,y,z,ci].every(Number.isInteger)||x<-this.L||x>=this.L||z<-this.L||z>=this.L||y<0||y>60) continue;
+        if(t==='a'&&ci>=0&&ci<PAL.length) this.addBlock(x,y,z,ci,false); else if(t==='d') this.removeBlock(bkey(x,y,z)); }
+      this.saveT=0.8; } finally{ this.netIn=false; } };
+  B.netScore=function(){ return '🧱 '+this.blocks.size; }; }
+/* Bataille Royale : on se tire dessus entre vrais joueurs.
+   Le tireur décide s'il touche (sur la position qu'il voit) et prévient sa cible ;
+   les tirs des copains sont rejoués pour le décor seulement (fx : sans dégâts). */
+{ const R=GAMES.royale, up=R.update, im=R.impact, el2=R.eliminate, ap=R.aimPoint;
+  R.netState=function(){ const s=netDefState(this); s.push(this.pEnt&&this.pEnt.alive?1:0); return s; };
+  R.netHide=function(){ return !(this.pEnt&&this.pEnt.alive); };
+  R.netFoes=function(){ const d=this.netDead||new Set(); return netPeers().filter(q=>q.s.length>=9&&q.s[8]===1&&!d.has(q.id)); };
+  R.netGhost=function(id){ const q=NET.players.get(id); this.netG=this.netG||{}; let g=this.netG[id];
+    if(!g) g=this.netG[id]={net:true,id,team:-1,isPlayer:false,alive:true,name:'Copain',col:'#ffffff',x:0,y:0,z:0};
+    if(q){ g.name=q.name; g.x=q.x||0; g.y=q.y||0; g.z=q.z||0; } return g; };
+  R.netHitTest=function(x,y,z){ for(const q of this.netFoes()) if(Math.abs(x-q.x)<0.45&&Math.abs(z-q.z)<0.45&&y>q.y&&y<q.y+1.9) return q; return null; };
+  R.netHit=function(q,dmg){ dmg=Math.round(dmg*10)/10; if(!(dmg>0)) return; netMsg({hit:dmg},q.id); this.dealt+=dmg;
+    const c=$('crosshair'); if(c){ c.classList.add('hit'); clearTimeout(this._hm); this._hm=setTimeout(()=>c.classList.remove('hit'),120); } sfx('hit');
+    if(this.dmgNum) this.dmgNum({x:q.x,y:q.y,z:q.z,alive:true},dmg,false); };
+  R.netShots=function(from,a){ const own=this.netGhost(from);
+    for(let i=0;i+11<a.length&&i<12*16;i+=12){ const x=a[i],y=a[i+1],z=a[i+2],vx=a[i+3],vy=a[i+4],vz=a[i+5],life=a[i+6];
+      if(![x,y,z,vx,vy,vz,life].every(Number.isFinite)) continue;
+      const col=typeof a[i+11]==='string'&&/^#[0-9a-f]{6}$/i.test(a[i+11])?a[i+11]:'#ffffff';
+      let m=this.pPool.pop(); if(!m){ m=new THREE.Mesh(sph(0.13),lam('#ffffff')); m.castShadow=false; this.scene.add(m); }
+      m.material=lam(col); m.scale.setScalar(clamp(+a[i+10]||1,0.5,3)); m.visible=true; m.position.set(x,y,z);
+      this.proj.push({x,y,z,vx,vy,vz,owner:own,dmg:0,life:clamp(life,0,6),splash:+a[i+7]||0,grav:+a[i+8]||0,bomb:a[i+9]?1:0,m,col,fx:true}); } };
+  R.netWin=function(){ if(this.over||!this.pEnt.alive||!this.modeChosen) return; if(this.bots.every(b=>!b.alive||b.team===0)&&!this.netFoes().length) this.end(true); };
+  R.netMsg=function(from,m){
+    if(Array.isArray(m.sh)) this.netShots(from,m.sh);
+    if(typeof m.hit==='number'&&isFinite(m.hit)&&this.pEnt.alive&&!this.over) this.dmgEnt(this.pEnt,clamp(m.hit,0,150)*0.6,this.netGhost(from));
+    if(m.ko){ const q=NET.players.get(from), n=q?q.name:'Copain'; this.kills++; banner('🎯 Tu as éliminé '+n+' !'); sfx('cp'); this.feed(S.name+' a éliminé 👤 '+n); (this.netDead=this.netDead||new Set()).add(from); this.netWin(); }
+    if(m.dead){ (this.netDead=this.netDead||new Set()).add(from); this.netWin(); } };
+  R.netSendShots=function(){ const out=[]; for(const p of this.proj) if(p.owner===this.pEnt&&!p.ns){ p.ns=1;
+      out.push(netR2(p.x),netR2(p.y),netR2(p.z),netR2(p.vx),netR2(p.vy),netR2(p.vz),netR2(p.life),p.splash||0,p.grav||0,p.bomb?1:0,netR2(p.m?p.m.scale.x:1),p.col||'#ffffff'); }
+    if(out.length) netMsg({sh:out}); };
+  R.update=function(dt){ const live=netLive(); if(live) this.netSendShots();
+    const r=up.apply(this,arguments);
+    if(live){ this.netSendShots(); this.nwT=(this.nwT||0)-dt; if(this.nwT<=0){ this.nwT=1; this.netWin(); } }
+    return r; };
+  R.impact=function(p,hit){
+    if(p.fx){ if(p.splash){ sfx('boom'); confetti(this.scene,p.x,p.y+0.3,p.z); } else if(hit.t==='s'||hit.t==='g') this.splat(p.x,p.y,p.z,p.col); return; }
+    if(hit.t==='n'){ this.netHit(hit.q,p.dmg); this.splat(p.x,p.y,p.z,p.col); return; }
+    if(p.splash&&p.owner===this.pEnt&&netLive()) for(const q of this.netFoes()){ const d=Math.hypot(q.x-p.x,q.y+0.9-p.y,q.z-p.z); if(d<p.splash) this.netHit(q,p.dmg*(1-d/p.splash*0.5)); }
+    return im.apply(this,arguments); };
+  R.eliminate=function(e,by){ const live=e.isPlayer&&netLive(); if(live&&by&&by.net) this.netNoEv=true;
+    const r=el2.apply(this,arguments);
+    if(live){ if(by&&by.net){ netMsg({ko:1},by.id); netEvent('🎯 '+by.name+' a éliminé '+S.name); } netMsg({dead:1}); }
+    return r; };
+  R.aimPoint=function(range){ const t=ap.apply(this,arguments); if(t.e||!netLive()) return t;
+    const tol=IS_TOUCH?0.2:0.08; let best=null, ba=tol;
+    for(const q of this.netFoes()){ const dx=q.x-cam.px, dy=q.y+1.1-cam.py, dz=q.z-cam.pz, l=Math.hypot(dx,dy,dz); if(l>range+cam.d) continue;
+      const a=Math.acos(clamp((dx*cam.fx+dy*cam.fy+dz*cam.fz)/l,-1,1)); if(a<ba&&this.los(this.pEnt,{x:q.x,y:q.y,z:q.z})){ ba=a; best=q; } }
+    return best?{x:best.x,y:best.y+1.1,z:best.z}:t; }; }
+
+/* =========================================================
    Lancement / sortie d'un jeu
    ========================================================= */
 let resTimer=null;
 function showResult(o){
+  if(G&&G.netR&&!G.netNoEv&&(NET.role==='host'||NET.role==='guest')) netEvent((o.icon||'🏁')+' '+S.name+' : '+o.title);
   $('rIcon').textContent=o.icon; $('rTitle').textContent=o.title; $('rSub').textContent=o.sub||'';
   const st=$('rStats'); st.innerHTML='';
   for(const [a,b] of o.stats){ const d=document.createElement('div'); d.className='stat'; const s1=document.createElement('span'); s1.textContent=a; const s2=document.createElement('b'); s2.textContent=b; d.appendChild(s1); d.appendChild(s2); st.appendChild(d); }
@@ -8547,7 +8824,7 @@ function showResult(o){
 }
 function startGame(id){
   unlockAudio();
-  if(G) exitGame();
+  if(G){ NET.sw=true; try{ exitGame(); } finally{ NET.sw=false; } }
   G=Object.create(GAMES[id]); G.id=id; G.scene=new THREE.Scene(); G.solids=[]; G.hazards=[]; G.coins=[]; G.time=0; G.over=false; G.earned=0;
   if(!G.query) G.query=function(){ return this.solids; };
   Object.assign(P,{x:0,y:0,z:0,vx:0,vy:0,vz:0,yaw:Math.PI,onGround:false,ground:null,coyote:0,jumpBuf:0,fly:false,fall:0,inv:0,knock:0});
@@ -8558,14 +8835,16 @@ function startGame(id){
   $('hudTop').innerHTML=G.hudHTML||''; $('kbdHint').textContent=G.hint||''; gxSet('');
   $('bAct').textContent=id==='arena'||id==='mc'||id==='pirates'?'⚔️':id==='island'?'⛏️':'🏏';
   PA=makeAvatar(S.avatar,S.name,{sword:id==='arena'||id==='pirates',bat:id==='eggs'||id==='brainrot',hand:id==='royale'||id==='mc'});
-  closeChoice(); G.start();
+  closeChoice(); netPreStart(id); netSeeded(()=>G.start(),'start');
   G.scene.add(PA.root);
   snapCam(); resize(); updateCoinsUI(); G.hud();
   bgmPlay(id); const gl=GAME_LIST.find(g=>g.id===id); if(gl) introCard(gl.ic,G.introT||gl.t,G.introS||'',gl.bg);
+  netPostStart(id);
 }
 function exitGame(){
   if(!G) return;
   clearTimeout(resTimer);
+  netPreExit();
   if(G.stop) G.stop();
   engineStop(true);
   clearParts(); disposeAvatar(PA); PA=null; disposeScene(G.scene); G=null; gxSet('');
@@ -8639,7 +8918,7 @@ function renderPlay(){
   const wrap=el('div','cards'); p.appendChild(wrap);
   for(const g of GAME_LIST){
     const b=el('button','card',`<span class="play">▶ Jouer</span><span class="ic">${g.ic}</span><h3>${g.t}</h3><p>${g.d}</p><span class="best">${g.best()}</span>`);
-    b.style.background=g.bg; b.addEventListener('click',()=>{ sfx('click'); startGame(g.id); }); wrap.appendChild(b);
+    b.style.background=g.bg; b.addEventListener('click',()=>{ sfx('click'); if(NET.role==='guest'){ netSuggest(g.id); return; } startGame(g.id); }); wrap.appendChild(b);
   }
 }
 function rerender(id,fn){ const p=$(id), st=p.scrollTop; fn(); p.scrollTop=st; }
@@ -8830,6 +9109,7 @@ function loop(now){
     if(G.update) G.update(dt);
   } else { P.vx*=0.9; P.vz*=0.9; if(G.idle) G.idle(dt); }
   if(!G) return;
+  netTick(G,dt);
   PA.root.position.set(P.x,P.y,P.z); PA.root.rotation.y=P.yaw;
   animAvatar(PA,dt,Math.hypot(P.vx,P.vz),P.onGround||P.fly);
   if(P.inv>0){ P.inv-=dt; PA.root.visible=!G.fp&&Math.floor(P.inv*14)%2===0; } else PA.root.visible=!G.fp;

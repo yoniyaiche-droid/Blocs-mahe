@@ -339,14 +339,14 @@ function rbPadMesh(){
     e.alive=false; e.hp=0;
     burst(this.scene,e.x,e.y+1,e.z,e.col||'#ffffff',16,6); confetti(this.scene,e.x,e.y+1.2,e.z); sfx('poof');
     if(!e.isPlayer){ e.A.root.visible=false; if(e.w) this.dropItem({kind:'w',w:e.w.w,r:e.w.r},e.x,e.z); if(Math.random()<0.6) this.dropItem({kind:'shield'},e.x+0.8,e.z); }
-    const nm=q=>q.isPlayer?S.name:(q.ally?'🤝 ':'🤖 ')+q.name;
+    const nm=q=>q.isPlayer?S.name:(q.net?'👤 ':q.ally?'🤝 ':'🤖 ')+q.name;
     this.feed(by&&by!==e?nm(by)+' a éliminé '+nm(e):nm(e)+' a été emporté par la tempête');
     if(by===this.pEnt&&!e.isPlayer){ this.kills++; this.streak=this.time-this.lastKill<6?this.streak+1:1; this.lastKill=this.time;
       banner(this.streak>=3?'🔥 '+this.streak+' éliminations d\'affilée !':this.streak===2?'⚡ Double élimination !':'🎯 Éliminé : '+e.name+' !'); if(this.streak>=2) sfx('cp'); }
     else if(by&&by.ally&&!e.isPlayer) this.allyKills++;
     if(e.isPlayer) return this.end(false,by);
     if(e.ally){ banner('💔 '+e.name+' est éliminé… continue, tu peux gagner !'); sfx('nope'); }
-    if(this.pEnt.alive&&this.bots.every(b=>!b.alive||b.team===0)) this.end(true);
+    if(this.pEnt.alive&&this.bots.every(b=>!b.alive||b.team===0)&&!(this.netFoes&&netLive()&&this.netFoes().length)) this.end(true);
   };
   R.end=function(win,by){
     if(this.over) return; this.over=true; this.firing=false;
@@ -393,7 +393,8 @@ function rbPadMesh(){
       const steps=Math.max(1,Math.ceil(Math.hypot(p.vx,p.vy,p.vz)*dt/0.4)), h=dt/steps;
       for(let s=0;s<steps&&!hit;s++){ p.x+=p.vx*h; p.y+=p.vy*h; p.z+=p.vz*h;
         if(p.y<0.03){ hit={t:'g'}; break; }
-        for(const e of this.ents) if(e!==p.owner&&e.alive&&e.team!==ot&&p.x>e.x-0.45&&p.x<e.x+0.45&&p.z>e.z-0.45&&p.z<e.z+0.45&&p.y>e.y&&p.y<e.y+1.9){ hit={t:'e',e}; break; }
+        if(!p.fx) for(const e of this.ents) if(e!==p.owner&&e.alive&&e.team!==ot&&p.x>e.x-0.45&&p.x<e.x+0.45&&p.z>e.z-0.45&&p.z<e.z+0.45&&p.y>e.y&&p.y<e.y+1.9){ hit={t:'e',e}; break; }
+        if(!hit&&p.owner===this.pEnt&&this.netHitTest&&netLive()){ const q=this.netHitTest(p.x,p.y,p.z); if(q) hit={t:'n',q}; }
         if(hit) break;
         for(const b of this.query(p.x-0.1,p.x+0.1,p.y-0.1,p.y+0.1,p.z-0.1,p.z+0.1)){ if(b===this.ground) continue;
           if(b.ramp){ const sy=b.ramp(p.x,p.z); if(p.y<sy+0.15&&p.y>sy-0.35){ hit={t:'s',b}; break; } continue; }

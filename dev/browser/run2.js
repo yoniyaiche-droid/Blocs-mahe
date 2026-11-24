@@ -52,8 +52,12 @@ const FAKE=`
   await ev(H,()=>{ __t.getS().name='Mahé'; });
   // 1. l'hôte ouvre une partie depuis le menu
   await ev(H,()=>{ __t.netOpenPanel(); return __t.netHost(); }); await wait(2500);
+  const h0=await ev(H,()=>({role:__t.NET.role,code:__t.NET.code,mode:__t.getMode()}));
+  ok(h0.role==='host'&&/^[A-Z2-9]{5}$/.test(h0.code)&&h0.mode==='menu','l\'hôte crée la partie (code '+h0.code+') et reste à l\'accueil pour choisir un jeu');
+  await H.bringToFront(); await wait(300); await ev(H,()=>__shot('net_lobby_host'));
+  await ev(H,()=>{ __t.netClosePanel(); __t.startGame('mc'); }); await wait(1500);
   const h1=await ev(H,()=>({role:__t.NET.role,code:__t.NET.code,g:__t.getG()&&__t.getG().id,seed:__t.getG()&&__t.getG().seed}));
-  ok(h1.role==='host'&&/^[A-Z2-9]{5}$/.test(h1.code)&&h1.g==='mc','l\'hôte crée la partie (code '+h1.code+') et entre dans le Monde de Blocs');
+  ok(h1.g==='mc','l\'hôte lance le Monde de Blocs');
   // un bloc posé avant l'arrivée de l'invité
   const B1=await ev(H,()=>{ const G=__t.getG(), P=__t.P; G.panel&&G.closePanel&&G.closePanel(); const x=Math.floor(P.x)+2, z=Math.floor(P.z), y=Math.floor(P.y)+3; G.setB(x,y,z,6); return [x,y,z]; });
   await H.bringToFront(); await wait(400); await ev(H,()=>__shot('net_host1'));
@@ -96,16 +100,20 @@ const FAKE=`
   await J.bringToFront(); await ev(J,()=>{ document.getElementById('netChatB').click(); }); await wait(300); await ev(J,()=>__shot('net_guest'));
   await ev(J,()=>{ document.getElementById('netChat').classList.remove('on'); __t.netOpenPanel(); }); await wait(300); await ev(J,()=>__shot('net_guest_panel'));
   // 7. Léo quitte : l'hôte le voit partir, et le monde de Léo n'a pas été touché
-  await ev(J,()=>{ document.getElementById('netPanel').classList.remove('on'); __t.exitGame(); }); await wait(1200);
-  ok(await ev(H,()=>__t.NET.players.size)===0,'quand Léo quitte, il disparaît chez l\'hôte');
+  await ev(J,()=>{ document.getElementById('netPanel').classList.remove('on'); __t.exitGame(); }); await wait(3500);
+  const gone=await ev(H,()=>{ const p=__t.NET.players.get('p1'); return {n:__t.NET.players.size,vis:!!(p&&p.A&&p.A.root.visible)}; });
+  ok(gone.n===1&&!gone.vis,'quand Léo revient à l\'accueil, son avatar disparaît chez l\'hôte (il reste connecté)');
   const own=await ev(J,()=>JSON.parse(localStorage.getItem('cubiverse-mc-v1')));
   ok(own&&own.seed===4242,'le monde à Léo est intact (graine '+(own&&own.seed)+')');
   // 8. Léo revient, puis l'hôte ferme
-  await ev(J,c=>{ __t.netOpenPanel(); return __t.netJoin(c); },h1.code); await wait(3500);
-  ok(await ev(J,()=>__t.NET.role)==='guest','Léo peut revenir dans la partie');
-  await ev(H,()=>__t.exitGame()); await wait(4000);
+  await ev(J,()=>__t.netSync()); await wait(3500);
+  const back=await ev(J,()=>({role:__t.NET.role,g:__t.getG()&&__t.getG().id,mode:__t.getMode()}));
+  ok(back.role==='guest'&&back.g==='mc'&&back.mode==='game','Léo peut revenir dans la partie (bouton Rejoindre)');
+  await ev(H,()=>__t.exitGame()); await wait(2500);
   const end=await ev(J,()=>({role:__t.NET.role,mode:__t.getMode()}));
-  ok(end.role===null&&end.mode==='menu','quand l\'hôte quitte, Léo revient au menu');
+  ok(end.role==='guest'&&end.mode==='menu','quand l\'hôte revient à l\'accueil, Léo aussi (toujours connecté)');
+  await ev(H,()=>__t.netLeave()); await wait(2500);
+  ok(await ev(J,()=>__t.NET.role)===null,'quand l\'hôte ferme la partie en ligne, Léo est déconnecté');
   await ev(H,()=>__t.netOpenPanel()); await H.bringToFront(); await wait(300); await ev(H,()=>__shot('net_menu_panel'));
   console.log(fails?'\nÉCHECS : '+fails:'\nTOUT EST OK');
   await b.close(); process.exit(fails?1:0);
