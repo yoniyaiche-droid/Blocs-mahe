@@ -1,0 +1,3 @@
+body.touch #hud[data-g="temple"] #bAct{display:grid}
+#hud[data-g="temple"].radar #compass{display:flex;top:116px}
+#hud[data-g="temple"] .hud-top .pill{background:rgba(20,40,30,.85);color:#e8ffe8;box-shadow:inset 0 0 0 2px #d9a832,0 4px 0 rgba(0,0,0,.35)}

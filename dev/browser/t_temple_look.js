@@ -1,0 +1,16 @@
+const T=window.__t, wait=ms=>new Promise(r=>setTimeout(r,ms)), log=[];
+window.addEventListener('error',e=>log.push('erreur: '+e.message+' @'+e.lineno));
+const S=T.getS(); S.gfx='high'; T.gfxApply();
+T.startGame('temple'); await wait(1000); let G=T.getG();
+document.querySelectorAll('#choice .ch-it')[2].click(); await wait(1800);
+const P_=T.P, cam=T.cam, go=async(x,z,yaw,pitch,ms,name)=>{ P_.x=x; P_.y=0.05; P_.z=z; P_.vx=P_.vz=0; cam.yaw=yaw; cam.pitch=pitch; await wait(ms); await window.__shot(name); };
+await go(0,9,0,0.25,1200,'t1_facade');
+await go(0,-3,0,0.2,900,'t2_hall');
+await go(0,-22,0,0.45,900,'t3_blocs');
+await go(0,-42,0,0.35,1200,'t4_pieges');
+await go(0,-63,0,0.12,900,'t5_leviers');
+await go(0,-82.5,0,0.4,900,'t6_lave');
+await go(0,-110,0,0.5,900,'t7_rocher');
+await go(0,-154,0,0.2,1200,'t8_tresor');
+log.push('lumières ok, niveau '+T.GFX.lv);
+T.exitGame(); return log.join('\n');
