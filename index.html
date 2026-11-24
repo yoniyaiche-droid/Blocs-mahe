@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Blocs Mahé">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="build" content="1795498297">
-<script>(function(){var B="1795498297",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
+<meta name="build" content="1795532873">
+<script>(function(){var B="1795532873",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
 <meta name="theme-color" content="#5ec8ff">
 <title>Blocs Mahé</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,6 +42,9 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .iconbtn{width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:20px;box-shadow:0 4px 0 rgba(29,24,70,.13);flex:0 0 auto}
 .iconbtn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(29,24,70,.13)}
 .iconbtn.on{background:var(--ink)}
+.sharecard{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;margin:0 0 12px;border-radius:20px;background:linear-gradient(140deg,#ff4f8b,#a855f7);color:#fff;text-align:left;box-shadow:0 5px 0 rgba(29,24,70,.18);font-family:inherit}
+.sharecard:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(29,24,70,.18)}
+.sharecard .ic{font-size:30px}.sharecard .tx{flex:1;min-width:0}.sharecard b{display:block;font-size:18px}.sharecard .tx span{display:block;font-size:13px;font-weight:600;opacity:.95}.sharecard .go{font-weight:800;background:#fff;color:#c42a62;border-radius:99px;padding:4px 10px;white-space:nowrap}
 .sheet{position:absolute;left:0;right:0;bottom:0;top:var(--top);background:var(--bg);border-radius:28px 28px 0 0;box-shadow:0 -6px 30px rgba(29,24,70,.18);display:flex;flex-direction:column;overflow:hidden}
 body.land .sheet{top:0;left:auto;width:var(--sw);border-radius:28px 0 0 28px}
 body.land .topbar{right:var(--sw)}
@@ -346,6 +349,7 @@ body:not(.touch) #mcHot{bottom:12px}
 @keyframes introA{0%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(-6deg)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(1deg)}20%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-64%) scale(.9)}}
 #choice{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(20,14,50,.45);z-index:7;padding:16px}
 #choice.on{display:flex}
+#choice.home{position:fixed;z-index:60}
 .ch-box{background:#fff;border-radius:26px;max-width:520px;width:100%;max-height:calc(100% - 40px);overflow:auto;padding:12px 14px 16px;box-shadow:0 10px 0 rgba(29,24,70,.25);color:var(--ink)}
 .ch-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:20px;font-weight:800;margin-bottom:4px}
 .ch-sub{margin:0 0 10px;font-size:14px;font-weight:600;color:var(--muted);line-height:1.3}
@@ -7024,6 +7028,43 @@ function gfxRender(sc){
   renderer.setRenderTarget(null); renderer.render(Q.sc,Q.cam);
 }
 $('bGfx').addEventListener('click',()=>{ sfx('click'); gfxCycle(); });
+/* ---- Partager l'application ---- */
+const SHARE_URL='https://yoniyaiche-droid.github.io/Blocs-mahe/';
+function shareLink(){ return /github\.io$/.test(location.hostname)?location.origin+location.pathname.replace(/index\.html$/,''):SHARE_URL; }
+function shareText(){ return 'Viens jouer avec moi à Blocs Mahé ! '+GAME_LIST.length+' jeux gratuits : courses, plateformes, temple, bestioles à attraper… 🎮'; }
+function copyLink(u){
+  const ok=()=>{ toast('Lien copié ! Colle-le dans un message.'); sfx('buy'); };
+  const old=()=>{ try{ const t=document.createElement('textarea'); t.value=u; t.setAttribute('readonly',''); t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); const r=document.execCommand('copy'); t.remove(); if(r) ok(); else toast(u); }catch(e){ toast(u); } };
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(ok,old); else old(); }catch(e){ old(); }
+}
+function shareMenu(){
+  const u=shareLink(), tx=shareText(), msg=encodeURIComponent(tx+' '+u);
+  /* la fenêtre de choix vit dans #hud (caché sur l'accueil) : on la sort le temps du partage */
+  const c=$('choice'), par=c.parentNode, nx=c.nextSibling, moved=!G&&par!==document.body;
+  if(moved){ document.body.appendChild(c); c.classList.add('home'); }
+  const back=()=>{ if(moved&&c.parentNode===document.body){ c.classList.remove('home'); par.insertBefore(c,nx); } };
+  const go=f=>()=>{ back(); f(); };
+  openChoice({title:'📤 Partager Blocs Mahé', sub:u, onClose:back, items:[
+    {ic:'💬', t:'WhatsApp', d:'Envoyer le lien', bg:'#dcf8c6', cb:go(()=>{ window.open('https://wa.me/?text='+msg,'_blank'); })},
+    {ic:'✉️', t:'SMS', d:'Par message', bg:'#e3ecff', cb:go(()=>{ location.href='sms:?&body='+msg; })},
+    {ic:'📧', t:'E-mail', d:'Par courriel', bg:'#fff1d6', cb:go(()=>{ location.href='mailto:?subject='+encodeURIComponent('Viens jouer à Blocs Mahé !')+'&body='+msg; })},
+    {ic:'📋', t:'Copier le lien', d:'Pour le coller ailleurs', bg:'#ffe1ec', cb:go(()=>copyLink(u))}
+  ]});
+}
+async function shareApp(){
+  sfx('click'); const u=shareLink();
+  if(navigator.share){
+    try{ await navigator.share({title:'Blocs Mahé', text:shareText(), url:u}); toast('Merci de partager Blocs Mahé ! 💖'); return; }
+    catch(e){ if(e&&e.name==='AbortError') return; }
+  }
+  shareMenu();
+}
+function shareCard(p){
+  const b=el('button','sharecard'), ic=el('span','ic'), tx=el('span','tx'), bb=el('b'), sm=el('span'), go=el('span','go');
+  ic.textContent='📤'; bb.textContent='Partager Blocs Mahé'; sm.textContent='Envoie le jeu à tes copains et ta famille'; go.textContent='Partager';
+  tx.appendChild(bb); tx.appendChild(sm); b.appendChild(ic); b.appendChild(tx); b.appendChild(go);
+  b.id='bShare'; b.setAttribute('aria-label','Partager Blocs Mahé'); b.addEventListener('click',shareApp); p.appendChild(b);
+}
 
 /* =========================================================
    20. Turbo Bolides : course de bolides inventés dans une ville
@@ -8603,7 +8644,7 @@ GAME_LIST.unshift(...GAME_EXTRA);
 function el(tag,cls,html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
 function renderPlay(){
   const p=$('pane-play'); p.innerHTML='';
-  const hi=el('div','hi'); hi.appendChild(document.createTextNode('Salut ')); const nm=el('span'); nm.textContent=S.name; hi.appendChild(nm); hi.appendChild(document.createTextNode(' ! À quoi on joue ?')); p.appendChild(hi); netCard(p);
+  const hi=el('div','hi'); hi.appendChild(document.createTextNode('Salut ')); const nm=el('span'); nm.textContent=S.name; hi.appendChild(nm); hi.appendChild(document.createTextNode(' ! À quoi on joue ?')); p.appendChild(hi); netCard(p); shareCard(p);
   const wrap=el('div','cards'); p.appendChild(wrap);
   for(const g of GAME_LIST){
     const b=el('button','card',`<span class="play">▶ Jouer</span><span class="ic">${g.ic}</span><h3>${g.t}</h3><p>${g.d}</p><span class="best">${g.best()}</span>`);

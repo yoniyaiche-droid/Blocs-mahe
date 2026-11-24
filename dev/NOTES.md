@@ -39,6 +39,8 @@ Jeu fait pour le fils de Yaiche, en français, sur téléphone. Tous les noms et
 - `mc` Monde de Blocs (monde infini) : armes 150-154, fusée 160, missions, argent, alliés, Lune ; **jeu à distance** (PeerJS 1.5.4 via jsDelivr/unpkg, code de 5 lettres, monde partagé, avatars, messages rapides). Ids d'objets pris : 100-102, 110-119, 130-142, 150-154, 160.
 - `pirates` Océan des Fruits : îles, bateau, 6 fruits mystiques qui transforment, boss.
 
+Partage : carte rose « Partager Blocs Mahé » sur l'accueil (`shareCard`, sous `netCard`) → `shareApp` ouvre le partage du téléphone (`navigator.share`), sinon `shareMenu` (WhatsApp, SMS, e-mail, copier le lien ; la fenêtre `#choice` est sortie de `#hud` le temps du partage puis remise en place). Lien : `SHARE_URL`. Test Chrome : `t_share.js`.
+
 Outils communs : `addSky`, `setLights`, `texMat`/`texC` (textures dessinées), `addAmb` (particules), musique `SONGS`/`bgmPlay` (bouton 🎵), `introCard`, `openChoice`/`closeChoice`.
 
 Sauvegarde : `S` dans `localStorage` (valeurs par défaut `DEF`, nettoyage au chargement). Le monde Minecraft est dans `cubiverse-mc-v1`.
