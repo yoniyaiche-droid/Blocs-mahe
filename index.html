@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#7b4ff0">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Blocs Mahé">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="build" content="1795536001">
-<script>(function(){var B="1795536001",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
+<meta name="build" content="1795538757">
+<script>(function(){var B="1795538757",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
 <meta name="theme-color" content="#5ec8ff">
 <title>Blocs Mahé</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -342,7 +342,7 @@ body:not(.touch) #mcHot{bottom:12px}
 #netBoard{position:absolute;left:66px;top:158px;display:none;flex-direction:column;gap:2px;background:rgba(29,24,70,.62);color:#fff;border-radius:12px;padding:5px 9px;font-size:12px;font-weight:800;pointer-events:none;max-width:52vw}
 #netBoard.on{display:flex}#netBoard div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#netBoard .me{color:#ffd23f}
 #hud #netChat.on~#netBoard{display:none}
-#hud[data-g="build"] #mcNet,#hud[data-g="build"] #netBoard,#hud[data-g="build"] #netChat{top:228px}#hud[data-g="build"] #netChatB{top:282px}#hud[data-g="build"] #netFeed{top:336px}
+#hud[data-g="build"] #mcNet,#hud[data-g="build"] #netChat{top:228px}#hud[data-g="build"] #netChatB{top:282px}#hud[data-g="build"] #netBoard{top:336px}#hud[data-g="build"] #netFeed{top:404px}
 #netFeed{position:absolute;left:12px;top:266px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:72vw;pointer-events:none}
 #netFeed .nf{background:rgba(29,24,70,.72);color:#fff;font-weight:700;font-size:14px;padding:5px 10px;border-radius:12px;animation:nfIn .25s}
 @keyframes nfIn{from{opacity:0;transform:translateX(-10px)}}
@@ -455,6 +455,73 @@ body.touch #hud[data-g="pirates"] #bAct{display:grid}
 .btn{flex:1;height:54px;border-radius:17px;font-weight:800;font-size:18px;background:var(--line);box-shadow:0 4px 0 #d6d1ea}
 .btn.primary{background:var(--pink);color:#fff;box-shadow:0 4px 0 #c42a62}
 .btn:active{transform:translateY(3px);box-shadow:none}
+
+/* ===== Adaptation à chaque téléphone : encoche et barre du bas (zone sûre),
+   petits écrans, téléphone couché. Classes posées par fitScreen() :
+   body.tb1/.tb2 (barre de l'accueil serrée), #hud --hd (décalage si la barre du haut passe sur 2 lignes) ===== */
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+#hud{top:var(--sat);bottom:var(--sab);left:var(--sal);right:var(--sar)}
+#dmgNums{position:fixed}
+.topbar{padding-top:calc(12px + var(--sat));padding-left:calc(14px + var(--sal));padding-right:calc(14px + var(--sar))}
+body:not(.land) .sheet{padding-bottom:var(--sab)}
+body.land .sheet{padding-right:var(--sar);padding-bottom:var(--sab)}
+.modal{padding:calc(14px + var(--sat)) calc(14px + var(--sar)) calc(14px + var(--sab)) calc(14px + var(--sal))}
+.modal .box{max-height:100%;overflow:auto}
+#netPanel{top:calc(64px + var(--sat));bottom:calc(16px + var(--sab));left:calc(12px + var(--sal));right:calc(12px + var(--sar))}
+#toast{bottom:calc(26px + var(--sab));max-width:calc(100vw - 24px);white-space:normal;text-align:center}
+.logo span{line-height:1.02}
+.topbar .iconbtn,.topbar .pill{flex:0 0 auto}
+.logo{min-width:0;flex:0 1 auto}
+body.tb1 .topbar{gap:6px;padding-left:calc(10px + var(--sal));padding-right:calc(10px + var(--sar))}
+body.tb1 .logo{font-size:20px;gap:6px}body.tb1 .logo svg{width:28px;height:28px}
+body.tb1 .topbar .iconbtn{width:38px;height:38px;font-size:17px}
+body.tb1 .topbar .pill{font-size:16px;padding:4px 11px 4px 6px}
+body.tb2 .logo{font-size:16px}body.tb2 .logo svg{width:26px;height:26px}
+body.tb2 .topbar .iconbtn{width:35px;height:35px;font-size:16px}
+body.tb2 .topbar .pill{font-size:15px;padding:4px 9px 4px 5px;gap:4px}
+/* la barre du haut d'un jeu passe sur 2 lignes : tout ce qui est en dessous descend */
+#eggBar,#brBar,#buildBar,#compass,#compass2,#mcBar,#mcNet,#netChatB,#netChat,#netBoard,#netFeed{margin-top:var(--hd,0px)}
+@media (max-width:430px){.hud-top{left:58px;right:92px;gap:5px}.hud-top .pill{font-size:14.5px;padding:4px 10px;gap:4px}.hud-coins{font-size:16px;padding:4px 11px 4px 6px}}
+@media (max-width:370px){
+  .hud-top{left:54px;right:84px;gap:4px}.hud-top .pill{font-size:13.5px;padding:4px 8px}.hud-coins{font-size:15px}
+  #joy{left:14px;bottom:18px;width:116px;height:116px}#joyKnob{width:52px;height:52px}
+  #bJump{right:14px;bottom:22px;width:80px;height:80px}
+  #bAct{right:104px;bottom:30px;width:64px;height:64px;font-size:27px}
+  #bFire{right:102px;bottom:26px;width:72px;height:72px;font-size:30px}
+  #bPow{right:104px;bottom:108px;width:56px;height:56px}
+  #hud[data-g="race"] #gx .rbtn[data-k="drift"]{right:100px!important}
+}
+@media (max-width:430px) and (orientation:portrait){#hud[data-g="race"] #rcSpd{left:auto!important;right:14px;bottom:112px!important;transform:none;align-items:flex-end}#rcSpd b{font-size:32px}#rcSpd .rcBar{width:112px}}
+@media (max-width:400px){#mcHot button{width:34px;height:34px}#mcHot button img{width:22px;height:22px}}
+@media (max-width:340px){#mcHot button{width:30px;height:30px}#mcHot button img{width:19px;height:19px}#mcHot{gap:2px;padding:3px}}
+@media (max-height:700px) and (orientation:portrait){#hotbar button{width:44px;height:44px;font-size:20px}#hotbar{gap:5px}}
+/* jeu en ligne : boutons à gauche, scores sous les boutons, messages en dessous */
+#netBoard{left:12px;top:266px}#netFeed{top:338px}
+#hud.bsBattle #mcNet,#hud.bsBattle #netChatB,#hud.bsBattle #netChat,#hud.bsBattle #netBoard{display:none!important}
+/* Bataille Royale : la colonne d'objets est à gauche, le jeu en ligne passe à droite, sous la carte */
+#hud[data-g="royale"] #mcNet,#hud[data-g="royale"] #netChatB{left:auto;right:12px}
+#hud[data-g="royale"] #mcNet{top:178px}#hud[data-g="royale"] #netChatB{top:232px}
+#hud[data-g="royale"] #netChat{left:auto;right:66px;top:178px}
+#hud[data-g="royale"] #netBoard{left:auto;right:12px;top:286px}
+#hud[data-g="royale"] #netFeed{left:auto;right:12px;top:356px;align-items:flex-end}
+/* téléphone couché */
+@media (orientation:landscape) and (max-height:500px){
+  #mcNet,#hud[data-g="royale"] #mcNet,#hud[data-g="build"] #mcNet{left:12px;right:auto;top:64px}
+  #netChatB,#hud[data-g="royale"] #netChatB,#hud[data-g="build"] #netChatB{left:64px;right:auto;top:64px}
+  #netChat,#netBoard,#hud[data-g="royale"] #netChat,#hud[data-g="royale"] #netBoard,#hud[data-g="build"] #netChat{left:12px;right:auto;top:116px}
+  #netFeed,#hud[data-g="royale"] #netFeed,#hud[data-g="build"] #netFeed{top:60px;left:50%;right:auto;transform:translateX(-50%);align-items:center}
+  #hud[data-g="build"] #mcNet{left:auto;right:100px;top:12px}#hud[data-g="build"] #netChatB{left:auto;right:152px;top:12px}
+  #hud[data-g="build"] #netChat{left:auto;right:100px;top:64px}#hud[data-g="build"] #netBoard{display:none!important}
+  .modal .box{padding:12px 16px}.box .big{font-size:38px}.box h2{font-size:22px;margin:4px 0 2px}.box .sub{font-size:14px}
+  .box .stats{gap:5px;margin:8px 0}.box .stat{padding:5px 12px;font-size:14.5px}.box .btn{height:44px;font-size:16px}
+  .ch-box{max-height:calc(100% - 16px)}
+  #bFruit{bottom:214px}
+  #intro{padding:10px 20px 12px}
+}
+@media (orientation:landscape) and (max-width:780px){
+  #hotbar{left:calc(50% - 14px)}#hotbar button{width:44px;height:44px;font-size:20px}
+  #mcHot{left:calc(50% - 22px)}#mcHot button{width:30px;height:30px}#mcHot button img{width:19px;height:19px}#mcHot{gap:2px;padding:3px}
+}
 </style>
 </head>
 <body>
@@ -8890,6 +8957,7 @@ function updateLobby(dt){
 function menuCam(){
   const w=innerWidth, h=innerHeight, land=w>h*1.05;
   document.body.classList.toggle('land',land);
+  { const tw=land?w-Math.min(520,w*0.52):w; document.body.classList.toggle('tb1',tw<430); document.body.classList.toggle('tb2',tw<350); }
   camera.fov=35; let regionH;
   if(land){ const sw=Math.min(520,w*0.52); document.documentElement.style.setProperty('--sw',sw+'px');
     camera.setViewOffset(w,h,sw/2,-h*0.02,w,h); regionH=h-120; }
@@ -8899,6 +8967,9 @@ function menuCam(){
   const visH=2.8/(regionH/h);
   lobby.camD=visH/(2*Math.tan(THREE.MathUtils.degToRad(17.5)));
 }
+let hudHd=-1;
+function hudFit(){ const t=$('hudTop'), h=$('hud'); if(!t||!h) return; const a=t.getBoundingClientRect(), b=h.getBoundingClientRect();
+  const d=a.height>2?Math.max(0,Math.round(a.bottom-b.top-56)):0; if(d!==hudHd){ hudHd=d; h.style.setProperty('--hd',d+'px'); } }
 function resize(){
   const w=innerWidth, h=innerHeight; renderer.setSize(w,h,false); camera.aspect=w/h;
   camera.far=(mode==='game'&&G&&G.far)||400;
@@ -9126,7 +9197,7 @@ function loop(now){
   updateCam(dt);
   envFrame(dt);
   const sun=G.scene.userData.sun, so=G.sunOff; if(sun){ sun.position.set(P.x+(so?so[0]:14),P.y+(so?so[1]:30),P.z+(so?so[2]:10)); sun.target.position.set(P.x,P.y,P.z); }
-  hudT-=dt; if(hudT<=0){ hudT=0.15; G.hud(); }
+  hudT-=dt; if(hudT<=0){ hudT=0.15; G.hud(); hudFit(); }
   gfxRender(G.scene);
 }
 

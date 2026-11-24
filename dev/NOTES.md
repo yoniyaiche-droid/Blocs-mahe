@@ -46,6 +46,10 @@ Outils communs : `addSky`, `setLights`, `texMat`/`texC` (textures dessinées), `
 
 Sauvegarde : `S` dans `localStorage` (valeurs par défaut `DEF`, nettoyage au chargement). Le monde Minecraft est dans `cubiverse-mc-v1`.
 
+## Affichage sur chaque téléphone
+
+Bloc CSS « Adaptation à chaque téléphone » (fin du premier `<style>`) + `fitScreen` : `viewport-fit=cover` et zone sûre (`--sat/--sab/--sal/--sar` = `env(safe-area-inset-*)`) : `#hud` est posé dans la zone sûre (encoche, barre du bas), `#dmgNums` reste en `position:fixed`. Barre de l'accueil serrée selon la place (`body.tb1` < 430 px, `body.tb2` < 350 px, calculé dans `menuCam`). Si la barre du haut d'un jeu passe sur 2 lignes, `hudFit()` (dans la boucle, toutes les 0,15 s) pose `--hd` sur `#hud` et les éléments du haut descendent (`margin-top:var(--hd)`). Commandes compactes sous 370 px, réglages téléphone couché (`orientation:landscape` et `max-height:500px`), boutons du jeu en ligne rangés selon l'orientation. Vérifier avec `node audit.js 320x568,390x844,667x375 all 1` (dans `/home/claude/browser`, écrit `audit.json` + captures `au_*.png` ; `NETFAKE=1` simule le tableau des scores en ligne) : aucun « DÉPASSE » ni « CHEVAUCHE » attendu (les « TEXTE COUPÉ » des cartes de l'accueil sont une décoration).
+
 ## Pièges connus
 
 - Un élément HTML créé seulement par `hudHTML` n'existe pas au chargement : ne pas faire `$('id').addEventListener` au niveau du module (ça a bloqué tout le menu). Utiliser une délégation sur `#hud`.
