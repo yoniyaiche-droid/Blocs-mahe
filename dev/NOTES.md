@@ -2,7 +2,7 @@
 
 Jeu fait pour le fils de Yaiche, en français, sur téléphone. Tous les noms et dessins doivent rester **originaux** (pas de personnages ni de marques existants).
 
-- Jeu en ligne : https://yoniyaiche-droid.github.io/Blocs-mahe/ (PWA installée sur le téléphone)
+- Jeu en ligne : **https://blocs-mahe.vercel.app/** (Vercel, projet `blocs-mahe`, se met à jour tout seul à chaque `git push` ; c'est l'adresse du bouton Partager, `SHARE_URL`). L'ancienne adresse GitHub Pages https://yoniyaiche-droid.github.io/Blocs-mahe/ (contient le nom de l'utilisateur, à ne plus partager) reste active seulement pour le déménagement : le script `<script id="move">` en tête de page y emballe la progression (clés `cubiverse-*`/`blocsmahe-*`, compressées) et renvoie vers la nouvelle adresse `#transfert=…`, qui l'importe (sans écraser une sauvegarde plus grosse) puis recharge. Ne pas désactiver GitHub Pages tant que des téléphones utilisent l'ancienne adresse. Test : `node t_move.js`.
 - Aperçu Claude (artefact) : slug `7aabf7c8-6b16-4642-9b02-0fc58bc9dbae`
 - Un seul fichier HTML, three.js r128 (cdnjs), tout le code dans une seule fonction `(function(){ … })()`.
 
