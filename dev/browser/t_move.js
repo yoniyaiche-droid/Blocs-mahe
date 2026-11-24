@@ -1,11 +1,12 @@
 const puppeteer=require('/opt/npm-tools/node_modules/puppeteer'); const fs=require('fs');
-const OLD='https://yoniyaiche-droid.github.io/Blocs-mahe/', NEW='https://blocs-mahe.vercel.app/';
+const OLD='https://yoniyaiche-droid.github.io/Blocs-mahe/', NEW='https://blocs-mahe.vercel.app/'; let newUp=true;
 (async()=>{
   const b=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:'new',args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
   const p=await b.newPage(); await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
   const html=fs.readFileSync('game_t.html','utf8');
   await p.setRequestInterception(true);
   p.on('request',r=>{ const u=r.url();
+    if(u.startsWith(NEW+'icon-192.png')) return newUp?r.respond({status:200,contentType:'image/png',body:fs.readFileSync('/home/claude/blocs-mahe/icon-192.png')}):r.respond({status:404,body:''});
     if(u.startsWith(OLD)||u.startsWith(NEW)){ if(/\.(png|json|webmanifest|js)(\?|$)/.test(u.split('#')[0])&&!u.includes('three')) return r.respond({status:404,body:''}); return r.respond({status:200,contentType:'text/html; charset=utf-8',body:html}); }
     if(u.includes('three.min.js')) return r.respond({status:200,contentType:'application/javascript',body:fs.readFileSync('three.min.js')});
     if(u.startsWith('data:')||u.startsWith('blob:')) return r.continue(); r.abort(); });
@@ -26,6 +27,7 @@ const OLD='https://yoniyaiche-droid.github.io/Blocs-mahe/', NEW='https://blocs-m
   let prep=true;
   p.on('request',r=>{ const u=r.url();
     if(prep&&u.startsWith(OLD)) return r.respond({status:200,contentType:'text/html',body:'<html><body>prep</body></html>'});
+    if(u.startsWith(NEW+'icon-192.png')) return newUp?r.respond({status:200,contentType:'image/png',body:fs.readFileSync('/home/claude/blocs-mahe/icon-192.png')}):r.respond({status:404,body:''});
     if(u.startsWith(OLD)||u.startsWith(NEW)){ if(/\.(png|json|webmanifest|js)(\?|$)/.test(u.split('#')[0])&&!u.includes('three')) return r.respond({status:404,body:''}); return r.respond({status:200,contentType:'text/html; charset=utf-8',body:html}); }
     if(u.includes('three.min.js')) return r.respond({status:200,contentType:'application/javascript',body:fs.readFileSync('three.min.js')});
     if(u.startsWith('data:')||u.startsWith('blob:')) return r.continue(); r.abort(); });
@@ -33,6 +35,11 @@ const OLD='https://yoniyaiche-droid.github.io/Blocs-mahe/', NEW='https://blocs-m
   const big=JSON.stringify({seed:4242,ch2:Array.from({length:60000},(_,i)=>i%97)});
   await p.evaluate((big,real)=>{ localStorage.setItem('cubiverse-save-v1',real); localStorage.setItem('cubiverse-mc-v1',big); localStorage.setItem('blocsmahe-ghost-v1','[1,2,3]'); localStorage.setItem('autre-site','x'); },big,real);
   prep=false; nav.length=0;
+  // 2b. si la nouvelle adresse ne répond pas, on reste et on joue sur l'ancienne
+  newUp=false; await p.goto(OLD,{waitUntil:'load'}); await wait(4000);
+  const st=await p.evaluate(()=>({url:location.href,coins:window.__t&&__t.getS().coins,moving:!!window.__moving}));
+  ok(st.url===OLD&&!st.moving&&st.coins===4321,'nouvelle adresse injoignable : on reste et on joue normalement ('+st.coins+' pièces)');
+  newUp=true; nav.length=0;
   // 3. on ouvre l'ancienne adresse : elle déménage
   await p.goto(OLD,{waitUntil:'load'}); await wait(7000);
   console.log('  navigations :',nav.join(' → '));

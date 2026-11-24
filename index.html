@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Blocs Mahé">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="build" content="1795542389">
-<script>(function(){var B="1795542389",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
+<meta name="build" content="1795542553">
+<script>(function(){var B="1795542553",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
 <meta name="theme-color" content="#5ec8ff">
 <script id="move">
 /* Déménagement (nov. 2026) : l'ancienne adresse GitHub (avec le nom) envoie vers la nouvelle
@@ -23,7 +23,7 @@
   var unb64=function(t){ t=t.replace(/-/g,'+').replace(/_/g,'/'); while(t.length%4) t+='='; var s=atob(t), u=new Uint8Array(s.length); for(var i=0;i<s.length;i++) u[i]=s.charCodeAt(i); return u; };
   var pipe=function(u8,st){ return new Response(new Blob([u8]).stream().pipeThrough(st)).arrayBuffer().then(function(b){ return new Uint8Array(b); }); };
   try{
-    if(location.hostname===OLD){
+    var move=function(){
       window.__moving=true; document.documentElement.className+=' moving';
       var o={}, n=0; for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(keep(k)){ o[k]=localStorage.getItem(k); n++; } }
       var go=function(h){ location.replace(NEW+(h?'#transfert='+h:'')); };
@@ -31,6 +31,13 @@
       var raw=new TextEncoder().encode(JSON.stringify(o));
       if(window.CompressionStream&&window.Blob&&Blob.prototype.stream) pipe(raw,new CompressionStream('deflate-raw')).then(function(z){ go('z'+b64(z)); },function(){ go('j'+b64(raw)); });
       else go('j'+b64(raw));
+    };
+    if(location.hostname===OLD){
+      /* on ne part que si la nouvelle adresse répond (son icône se charge) ; sinon on joue ici comme avant */
+      var img=new Image(), to=setTimeout(function(){ img.onload=img.onerror=null; },8000);
+      img.onerror=function(){ clearTimeout(to); };
+      img.onload=function(){ clearTimeout(to); try{ move(); }catch(e){} };
+      img.src=NEW+'icon-192.png?v='+Date.now();
       return;
     }
     var m=/[#&]transfert=([zj])([A-Za-z0-9_-]+)/.exec(location.hash);
