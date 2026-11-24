@@ -1,0 +1,12 @@
+body.touch #hud[data-g="race"] #bJump,body.touch #hud[data-g="race"] #bAct{display:none!important}
+#hud[data-g="race"] .hud-top .pill{background:rgba(30,16,60,.82);color:#fff;box-shadow:inset 0 0 0 2px #ff7e5f,0 4px 0 rgba(0,0,0,.3)}
+#hud[data-g="race"] #gx .rbtn{background:rgba(30,16,60,.88);color:#fff;box-shadow:0 0 16px rgba(255,126,95,.55),0 5px 0 rgba(0,0,0,.35)}
+#rcMap{width:120px;height:90px;border-radius:14px;border:3px solid rgba(255,255,255,.85);pointer-events:none}
+#rcSpd{transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none;color:#fff;text-shadow:0 3px 0 rgba(20,10,40,.6)}
+#rcSpd b{font-size:40px;line-height:1;font-weight:900;font-style:italic}
+#rcSpd span{font-size:13px;font-weight:800;opacity:.9;margin-top:-2px}
+#rcSpd .rcBar{width:150px;height:12px;border-radius:99px;background:rgba(20,10,40,.55);border:2px solid #fff;overflow:hidden;margin-top:4px}
+#rcSpd .rcBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4fd8ff,#b06bff);transition:width .15s}
+#rcSpd .rcBar.full i{background:linear-gradient(90deg,#ffd23f,#ff4f6d);box-shadow:0 0 12px #ffd23f}
+#rcLines{inset:0;pointer-events:none;opacity:0;transition:opacity .25s;background:repeating-conic-gradient(from 0deg at 50% 52%,rgba(255,255,255,.0) 0deg 5deg,rgba(255,255,255,.22) 5deg 6deg);-webkit-mask:radial-gradient(circle at 50% 52%,transparent 32%,#000 75%);mask:radial-gradient(circle at 50% 52%,transparent 32%,#000 75%)}
+@media (min-aspect-ratio:1/1){#rcMap{top:70px!important}}

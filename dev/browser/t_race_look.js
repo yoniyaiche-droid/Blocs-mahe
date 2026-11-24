@@ -1,0 +1,18 @@
+const T=window.__t, wait=ms=>new Promise(r=>setTimeout(r,ms)), log=[];
+window.addEventListener('error',e=>log.push('erreur: '+e.message+' @'+e.lineno));
+const S=T.getS(); S.gfx='high'; T.gfxApply();
+T.startGame('race'); await wait(1800); let G=T.getG(); await window.__shot('rc1_choix');
+document.querySelectorAll('#choice .ch-it')[1].click(); await wait(1500); await window.__shot('rc2_grille');
+await wait(3200);
+const Tt=G.T, N=Tt.N; let t0=performance.now(), shots=0;
+const drive=()=>{ const c=G.car, la=(c.i+10)%N, ta=Math.atan2(Tt.tx[la],Tt.tz[la]); let d=((ta-c.h+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; T.joy.x=Math.max(-1,Math.min(1,-d*2.2-c.off*0.06)); G.btn.drift=Math.abs(Tt.k[la])>0.035&&c.spd>20; };
+const iv=setInterval(drive,30);
+await wait(3500); await window.__shot('rc3_course');
+G.nitro=1; G.useNitro(); await wait(900); await window.__shot('rc4_turbo');
+let n=0; while(!G.car.drift&&n<300){ await wait(30); n++; } await wait(300); await window.__shot('rc5_derapage');
+n=0; while(!G.car.air&&n<600){ await wait(30); n++; } await wait(150); await window.__shot('rc6_saut');
+log.push('fps approx: niveau '+T.GFX.lv+' place '+G.place()+' tour '+G.car.lap+' air '+G.car.air);
+clearInterval(iv); T.joy.x=0; G.btn.drift=false;
+G.car.lap=4; G.finish(); await wait(1800); await window.__shot('rc7_fin');
+T.exitGame(); await wait(300); await window.__shot('rc8_menu');
+return log.join('\n');

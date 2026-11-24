@@ -146,7 +146,7 @@ T.startGame('arena'); { let G=T.getG(); frames(10); G.breakT=999;
   G.slimes.forEach(s=>{ s.dead=true; G.scene.remove(s.g); }); G.slimes=[]; G.wave=3; G.toSpawn=0; G.breakT=0;
   G.offerUpgrade(); check(G.choiceOpen&&G.offer.length===3,'3 améliorations proposées');
   for(let i=0;i<16*60;i++) frames(1); check(!G.choiceOpen&&Object.keys(G.up).length===1,'choix automatique au bout de 15 s ('+Object.keys(G.up)+')');
-  G.up={}; G.applyUp({k:'heart',ic:'',t:''}); check(G.maxH===6&&G.hearts===6,'amélioration cœur : 6 cœurs');
+  G.up={}; G.maxH=5; G.hearts=5; G.applyUp({k:'heart',ic:'',t:''}); check(G.maxH===6&&G.hearts===6,'amélioration cœur : 6 cœurs');
 } T.exitGame();
 
 console.log('ÎLE');

@@ -1,5 +1,5 @@
 // Blocs Mahé : permet de rejouer même sans connexion après la première visite
-const CACHE='blocs-mahe-1795477491';
+const CACHE='blocs-mahe-1795479254';
 const LOCAL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 const THREE_JS='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 self.addEventListener('install',e=>{
