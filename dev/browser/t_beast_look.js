@@ -1,0 +1,16 @@
+const T=window.__t, wait=ms=>new Promise(r=>setTimeout(r,ms)), log=[];
+window.addEventListener('error',e=>log.push('erreur: '+e.message+' @'+e.lineno));
+const S=T.getS(); S.gfx='high'; T.gfxApply(); S.beast.team=[]; S.coins=200;
+T.startGame('beast'); await wait(1000); let G=T.getG();
+document.querySelectorAll('#choice .ch-it')[1].click(); await wait(700); await window.__shot('b1_starter');
+document.querySelectorAll('#choice .ch-it')[0].click(); await wait(1800); await window.__shot('b2_village');
+const P_=T.P, cam=T.cam;
+const z0=G.roam.filter(o=>o.z.n==='Prairie'); P_.x=24; P_.z=8; cam.yaw=Math.PI*0.7; cam.pitch=0.35; for(const o of z0){ o.x=27+Math.random()*4; o.zz=2+Math.random()*4; o.tx=o.x; o.tz=o.zz; } await wait(900); await window.__shot('b3_prairie');
+P_.x=-30; P_.z=4; cam.yaw=-Math.PI*0.4; cam.pitch=0.3; await wait(900); await window.__shot('b4_volcan');
+P_.x=32; P_.z=-32; cam.yaw=Math.PI*0.9; cam.pitch=0.3; await wait(900); await window.__shot('b5_arene');
+G.startBattle([T.bsNew('zeclair',6)],false); await wait(2600); await window.__shot('b6_combat');
+document.querySelector('[data-k="m1"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); await wait(900); await window.__shot('b7_attaque');
+await wait(2500); G.foe().hp=1; G.inB.state='choose'; document.querySelector('[data-k="jar"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); await wait(1500); await window.__shot('b8_bocal');
+await wait(4000); G.dexMenu(); await wait(500); await window.__shot('b9_album');
+log.push('équipe '+S.beast.team.map(c=>c.s+' '+c.lv).join(', ')+' · album '+S.beast.caught.length);
+T.exitGame(); return log.join('\n');

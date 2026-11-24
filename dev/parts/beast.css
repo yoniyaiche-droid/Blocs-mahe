@@ -1,0 +1,16 @@
+#hud.bsBattle #joy,#hud.bsBattle #bJump,#hud.bsBattle #bAct{display:none!important}
+#hud[data-g="beast"] .hud-top .pill{background:#fffaf0;color:#3a5a2a;box-shadow:0 4px 0 #9bd07a}
+#hud.bsFlash::after{content:'';position:fixed;inset:0;background:#fff;pointer-events:none;animation:bsFl .5s ease-out forwards;z-index:50}
+@keyframes bsFl{from{opacity:1}to{opacity:0}}
+#gx .bsCard{background:rgba(255,255,255,.94);border-radius:16px;padding:8px 12px;box-shadow:0 5px 0 rgba(29,24,70,.18);color:#1d1846;min-width:170px;pointer-events:none}
+#gx .bsCard b{font-size:16px;font-weight:900}#gx .bsCard span{font-size:13px;font-weight:800;opacity:.7}#gx .bsCard small{float:right;font-weight:800;font-size:12px;margin-top:3px}
+#gx .bsHp,#gx .bsXp{height:10px;border-radius:99px;background:#e6e0f0;overflow:hidden;margin-top:5px}#gx .bsXp{height:5px;margin-top:3px}
+#gx .bsHp i,#gx .bsXp i{display:block;height:100%;width:100%;background:#3ad17a;transition:width .1s}#gx .bsXp i{background:#4fa8ff}
+#gx .bsPanel{display:flex;flex-direction:column;gap:6px}
+#gx .bsPanel .bsCard{align-self:flex-end;width:62%}
+#bsMsg{background:rgba(29,24,70,.88);color:#fff;font-weight:800;font-size:15px;border-radius:14px;padding:10px 12px;min-height:22px}
+#gx .bsMoves{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#gx .bsMoves button,#gx .bsActs button{border:0;border-radius:14px;padding:11px 6px;font-weight:900;font-size:14px;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25);text-shadow:0 1px 0 rgba(0,0,0,.35);font-family:inherit}
+#gx .bsActs{display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1fr;gap:6px}#gx .bsActs button{background:#6d3fd6;font-size:16px}
+#gx .bsPanel.busy .bsMoves,#gx .bsPanel.busy .bsActs{opacity:.45;pointer-events:none}
+#gx .bsMoves button.down,#gx .bsActs button.down{transform:translateY(2px)}
