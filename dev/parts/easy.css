@@ -1,0 +1,19 @@
+/* 26. tutoriels animés, visée auto, guidage */
+#tuto{position:absolute;inset:0;z-index:60;background:rgba(20,16,50,.28);pointer-events:auto}
+#tuto .tuHand{position:absolute;font-size:54px;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));transition:transform .12s;pointer-events:none;will-change:left,top}
+#tuto .tuHand.press{transform:scale(.84) translateY(3px)}
+#tuto .tuRing{position:absolute;border:4px solid #ffd23f;box-shadow:0 0 0 4px rgba(255,210,63,.35),0 0 24px rgba(255,210,63,.8);animation:tuRing 1s ease-in-out infinite;pointer-events:none}
+@keyframes tuRing{50%{transform:scale(1.08);opacity:.75}}
+#tuto .tuRip{position:absolute;width:60px;height:60px;border-radius:50%;border:3px solid #fff;animation:tuRip 1s ease-out infinite;pointer-events:none}
+@keyframes tuRip{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.5);opacity:0}}
+#tuto .tuCap{position:absolute;left:50%;transform:translateX(-50%);width:min(88%,420px);background:#fff;color:#1d1846;border-radius:22px;padding:14px 18px;font-size:19px;line-height:1.28;text-align:center;box-shadow:0 8px 0 rgba(29,24,70,.25);pointer-events:none}
+#tuto .tuCap.top{top:84px}#tuto .tuCap.mid{top:auto;bottom:34%}
+#tuto .tuCap.pop{animation:tuPop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes tuPop{0%{transform:translateX(-50%) scale(.7);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+#tuto .tuBar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(29,24,70,.75);border-radius:99px;padding:6px 6px 6px 14px}
+#tuto .tuDots{display:flex;gap:5px}#tuto .tuDots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.35)}#tuto .tuDots i.on{background:#ffd23f}
+#tuto .tuSkip{font:inherit;font-weight:800;font-size:15px;color:#1d1846;background:#ffd23f;border:0;border-radius:99px;padding:8px 14px;box-shadow:0 3px 0 #c9a114;white-space:nowrap}
+#hud.tutoOn #netChat,#hud.tutoOn #netBoard{display:none}
+#crosshair.lock{border-color:#ff3355;box-shadow:0 0 0 3px rgba(255,51,85,.35),0 0 14px rgba(255,51,85,.8);transform:scale(1.15)}
+#hud[data-g="royale"].guide #compass{display:flex}
+@media (orientation:landscape) and (max-height:500px){#tuto .tuCap{font-size:16px;padding:10px 14px}#tuto .tuCap.top{top:58px}#tuto .tuCap.mid{bottom:24%}#tuto .tuHand{font-size:44px}}
