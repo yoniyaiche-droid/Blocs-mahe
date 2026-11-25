@@ -1,0 +1,52 @@
+const wait=ms=>new Promise(r=>setTimeout(r,ms)), log=[]; let fails=0; const ok=(c,t)=>{ log.push((c?'✔ ':'✘ ')+t); if(!c) fails++; };
+const S=__t.getS(); S.mc.cash=1000; localStorage.removeItem('blocsmahe-photos-v1');
+__t.startGame('mc'); await wait(1800);
+const sv=[...document.querySelectorAll('#mcPanel button')].find(x=>/Survie/.test(x.textContent)); if(sv) sv.click(); await wait(800);
+let G=__t.getG();
+G.openPanel('shop'); await wait(300);
+const rowB=[...document.querySelectorAll('#mcPanel .buy')].find(b=>b.closest('div')&&/Drone/.test(b.parentNode.textContent)); if(rowB) rowB.click(); await wait(400);
+ok(S.mc.own.includes(170)&&S.mc.own.includes(171)&&G.hot[G.sel]===171,'achat du drone + télécommande (en main)');
+G.closePanel&&G.closePanel(); await wait(200);
+const p0=[__t.P.x,__t.P.z];
+G.onAction(); await wait(500);
+ok(G.piloting&&G.dr&&getComputedStyle(document.getElementById('drUI')).display!=='none','⚔️ fait décoller le drone (panneau 🔋 visible)');
+const y0=G.dr.y; window.__t.keys.add('Space'); await wait(1600); window.__t.keys.delete('Space');
+ok(G.dr.y>y0+3,'▲ fait monter le drone ('+(G.dr.y-y0).toFixed(1)+' m)');
+const dx0=G.dr.x, dz0=G.dr.z; __t.joy.y=1; await wait(1600); __t.joy.y=0;
+const d1=Math.hypot(G.dr.x-dx0,G.dr.z-dz0), pm=Math.hypot(__t.P.x-p0[0],__t.P.z-p0[1]);
+ok(d1>6&&pm<0.3,'le drone avance ('+d1.toFixed(1)+' m), le joueur reste sur place ('+pm.toFixed(2)+' m)');
+await wait(300); await window.__shot('mc3_drone');
+G.onAction(); await wait(700);
+const ph=JSON.parse(localStorage.getItem('blocsmahe-photos-v1')||'[]');
+ok(ph.length===1&&/^data:image\/jpeg/.test(ph[0].u)&&ph[0].u.length>5000,'📸 photo prise depuis le drone ('+Math.round((ph[0]||{u:''}).u.length/1024)+' Ko)');
+document.querySelector('#drUI .drX').click(); await wait(200);
+ok(!G.piloting&&G.dr&&G.dr.state==='home','✋ Arrêter : le drone revient');
+for(let k=0;k<30&&G.dr;k++) await wait(200);
+ok(!G.dr,'le drone est revenu dans l\'inventaire');
+// Planète Rouge
+const P=__t.P; P.x=520; P.z=-380; P.y=301; P.vx=P.vy=P.vz=0; await wait(1500);
+ok(Math.abs(P.y-300)<0.2&&Math.abs(G.grav-0.5)<0.01,'on marche sur la Planète Rouge (y '+P.y.toFixed(2)+', gravité '+G.grav+')');
+const c=G.spCr.find(q=>q.b.id==='mars'); const cash0=S.mc.cash; P.x=c.x; P.z=c.z; await wait(700);
+ok(S.mc.cash===cash0+30&&(S.mc.st.cr_mars&1<<c.i),'💎 cristal d\'étoile ramassé (+30 🪙)');
+const nav=document.getElementById('spNav'); ok(nav&&getComputedStyle(nav).display!=='none','boussole spatiale : '+(nav?nav.textContent:''));
+P.x=520; P.z=-372; await wait(900); await window.__shot('mc3_mars');
+// fusée qui atterrit sur la Planète Glacée
+const rk=G.addVehicle('rocket','#f4f4f4',-540,318,320,0); G.enterVehicle(rk); rk.air=true; rk.cd=0; rk.vy=0;
+window.__t.keys.add('ShiftLeft'); for(let k=0;k<40&&rk.air;k++) await wait(200); window.__t.keys.delete('ShiftLeft');
+ok(!rk.air&&Math.abs(rk.y-300)<0.3&&S.mc.st.v_ice===1,'la fusée se pose sur la Planète Glacée (« '+(document.getElementById('banner')||{}).textContent+' »)');
+G.exitVehicle(true); await wait(400); ok(Math.abs(P.y-300)<0.5,'on descend sur la Planète Glacée');
+await wait(600); await window.__shot('mc3_glace');
+// station + anneau de retour
+P.x=200-12+0.2; P.z=430+8; P.y=331; await wait(800); await window.__shot('mc3_station');
+const pad=G.spPads.find(q=>q.b.id==='station'); P.x=pad.x; P.z=pad.z; P.y=330.2; await wait(2600);
+ok(P.y<100,'l\'anneau vert ramène sur Terre (y '+P.y.toFixed(0)+')');
+__t.exitGame(); await wait(800);
+// accueil : défis du jour, photos
+const daily=document.querySelector('.daily'); ok(daily&&daily.querySelectorAll('.dr').length===3,'accueil : 3 défis du jour ('+(daily?daily.querySelector('.dh').textContent:'')+')');
+document.getElementById('pane-play').scrollTop=0; await wait(300); await window.__shot('mc3_accueil');
+const mb=[...document.querySelectorAll('.morebtn')]; ok(mb.length===2,'boutons 📸 Mes photos et ⭐ Plus');
+mb[0].click(); await wait(500); ok(document.querySelectorAll('#album .al-it').length===1,'album : la photo du drone y est'); await window.__shot('mc3_album');
+document.querySelector('#album .al-x').click(); await wait(200); mb[1].click(); await wait(400);
+ok(document.querySelectorAll('#choice.on .ch-it').length===6,'menu ⭐ Plus : '+[...document.querySelectorAll('#choice.on .ch-it b')].map(b=>b.textContent).join(' / '));
+await window.__shot('mc3_plus');
+log.push(fails?'ÉCHECS : '+fails:'TOUT EST OK'); return log.join('\n');

@@ -1,0 +1,23 @@
+/* 27-28 : drone, boussole spatiale, défis du jour, album */
+#drUI{position:absolute;top:64px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:8px;white-space:nowrap;max-width:94%;background:rgba(29,24,70,.78);color:#fff;border-radius:99px;padding:6px 6px 6px 14px;font-weight:800;font-size:15px;margin-top:var(--hd,0px);z-index:5}
+#drUI.low .drB{color:#ff6b6b;animation:tuRing .8s infinite}
+#drUI .drB,#drUI .drD{font-size:14px}#drUI .drX{font:inherit;font-weight:800;background:#ffd23f;color:#1d1846;border:0;border-radius:99px;padding:7px 12px;white-space:nowrap}
+#hud.droneOn #mcBar,#hud.droneOn #mcHot,#hud.droneOn #compass{display:none!important}
+#spNav{position:absolute;right:12px;top:118px;display:none;align-items:center;gap:6px;background:rgba(10,14,40,.75);color:#fff;border-radius:99px;padding:5px 12px 5px 6px;font-weight:800;font-size:14px;margin-top:var(--hd,0px);pointer-events:none}
+#spNav .spA{display:inline-block;font-size:20px;color:#7dd8ff;transition:transform .15s}
+.daily{background:#fff;border-radius:20px;padding:10px 14px 12px;margin:0 0 12px;box-shadow:0 5px 0 rgba(29,24,70,.12)}
+.daily .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.daily .dh b{font-size:17px}.daily .dh span{font-weight:800;color:#ff7a1a}
+.daily .dr{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;font-size:14px;font-weight:700;margin-top:6px}
+.daily .dr i{grid-column:1/3;height:7px;border-radius:9px;background:#eee9ff;overflow:hidden}.daily .dr u{display:block;height:100%;background:linear-gradient(90deg,#7b4ff0,#ff4f8b);text-decoration:none}
+.daily .dr em{font-style:normal;color:#7b4ff0;font-weight:800}.daily .dr.ok .dt{color:#1f9d55}.daily .dr.ok u{background:#22c55e}
+.morerow{display:flex;gap:10px;margin:4px 0 18px}.morebtn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:18px;padding:12px;background:#fff;color:#1d1846;font:inherit;font-weight:800;font-size:16px;box-shadow:0 5px 0 rgba(29,24,70,.12)}
+.morebtn span{font-size:22px}.morebtn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(29,24,70,.12)}
+#album .al-box{width:min(94vw,560px);max-height:calc(100% - 10px);display:flex;flex-direction:column}
+#album .al-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}#album .al-h b{font-size:20px}
+#album .al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;overflow:auto}
+#album .al-it{border:0;padding:0;border-radius:14px;overflow:hidden;background:#eee;position:relative;aspect-ratio:3/4}
+#album .al-it img{width:100%;height:100%;object-fit:cover;display:block}#album .al-it span{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:700;border-radius:8px;padding:2px 6px}
+#album .al-empty{font-size:16px;line-height:1.4;color:#5a5480;grid-column:1/-1}
+#flashShot{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:300}#flashShot.on{animation:shotA .45s ease-out}
+@keyframes shotA{0%{opacity:.9}100%{opacity:0}}
+@media (orientation:landscape) and (max-height:500px){#drUI{top:12px;margin-top:0}#spNav{top:64px}}
