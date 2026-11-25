@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Blocs Mahé">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="build" content="1795571635">
-<script>(function(){var B="1795571635",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
+<meta name="build" content="1795572583">
+<script>(function(){var B="1795572583",ready=false;function ingame(){var h=document.getElementById("hud");return h&&h.classList.contains("on")}function go(){if(ingame()){setTimeout(go,3000);return}location.reload()}function chk(){if(ready||!navigator.onLine)return;fetch("index.html?c="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){var m=t.match(/name="build" content="(\d+)"/);if(m&&m[1]!==B){ready=true;if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update()})});go()}}).catch(function(){})}document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});setTimeout(chk,8000);setInterval(chk,600000)})();</script>
 <meta name="theme-color" content="#5ec8ff">
 <script id="move">
 /* Déménagement (nov. 2026) : l'ancienne adresse GitHub (avec le nom) envoie vers la nouvelle
@@ -7197,9 +7197,10 @@ function postInit(){
       fragmentShader:'uniform sampler2D t; uniform vec2 px; uniform float th; varying vec2 vUv; void main(){ vec3 c=(texture2D(t,vUv+px*vec2(-1.0,-1.0)).rgb+texture2D(t,vUv+px*vec2(1.0,-1.0)).rgb+texture2D(t,vUv+px*vec2(-1.0,1.0)).rgb+texture2D(t,vUv+px*vec2(1.0,1.0)).rgb)*0.25; float l=dot(c,vec3(0.299,0.587,0.114)); gl_FragColor=vec4(c*smoothstep(th,th+0.12,l),1.0); }'},base));
     Q.blur=new THREE.ShaderMaterial(Object.assign({uniforms:{t:{value:null},d:{value:new THREE.Vector2()}},vertexShader:vs,
       fragmentShader:'uniform sampler2D t; uniform vec2 d; varying vec2 vUv; void main(){ vec3 c=texture2D(t,vUv).rgb*0.227; c+=(texture2D(t,vUv+d*1.385).rgb+texture2D(t,vUv-d*1.385).rgb)*0.316; c+=(texture2D(t,vUv+d*3.231).rgb+texture2D(t,vUv-d*3.231).rgb)*0.07; gl_FragColor=vec4(c,1.0); }'},base));
-    Q.comp=new THREE.ShaderMaterial(Object.assign({uniforms:{t:{value:null},b:{value:null},px:{value:new THREE.Vector2()},bs:{value:0.5},fx:{value:MS?0:1},vig:{value:0.3},sat:{value:1.08}},vertexShader:vs,
+    Q.comp=new THREE.ShaderMaterial(Object.assign({uniforms:{t:{value:null},b:{value:null},px:{value:new THREE.Vector2()},bs:{value:0.5},fx:{value:MS?0:1},vig:{value:0.3},sat:{value:1.08},film:{value:0.55},shp:{value:0.16}},vertexShader:vs,
       fragmentShader:[
-      'uniform sampler2D t; uniform sampler2D b; uniform vec2 px; uniform float bs; uniform float fx; uniform float vig; uniform float sat; varying vec2 vUv;',
+      'uniform sampler2D t; uniform sampler2D b; uniform vec2 px; uniform float bs; uniform float fx; uniform float vig; uniform float sat; uniform float film; uniform float shp; varying vec2 vUv;',
+      'vec3 aces(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0); }',
       'float lu(vec3 c){ return dot(c,vec3(0.299,0.587,0.114)); }',
       'vec3 aa(vec2 uv){ vec3 cM=texture2D(t,uv).rgb; if(fx<0.5) return cM;',
       ' float a=lu(texture2D(t,uv+vec2(-1.0,-1.0)*px).rgb), b2=lu(texture2D(t,uv+vec2(1.0,-1.0)*px).rgb), c=lu(texture2D(t,uv+vec2(-1.0,1.0)*px).rgb), d=lu(texture2D(t,uv+vec2(1.0,1.0)*px).rgb), m=lu(cM);',
@@ -7208,7 +7209,9 @@ function postInit(){
       ' dir=clamp(dir*rc,vec2(-8.0),vec2(8.0))*px;',
       ' vec3 A=0.5*(texture2D(t,uv+dir*(-1.0/6.0)).rgb+texture2D(t,uv+dir*(1.0/6.0)).rgb);',
       ' vec3 B=A*0.5+0.25*(texture2D(t,uv-dir*0.5).rgb+texture2D(t,uv+dir*0.5).rgb); float lB=lu(B); return (lB<mn||lB>mx)?A:B; }',
-      'void main(){ vec3 c=aa(vUv)+texture2D(b,vUv).rgb*bs; float l=lu(c); c=mix(vec3(l),c,sat); c=(c-0.5)*1.04+0.5;',
+      'void main(){ vec3 c=aa(vUv);',
+      ' if(fx<0.5){ vec3 nb=texture2D(t,vUv+vec2(px.x,0.0)).rgb+texture2D(t,vUv-vec2(px.x,0.0)).rgb+texture2D(t,vUv+vec2(0.0,px.y)).rgb+texture2D(t,vUv-vec2(0.0,px.y)).rgb; c=c+(c*4.0-nb)*shp; }',
+      ' c+=texture2D(b,vUv).rgb*bs; c=mix(c,aces(c*1.08),film); float l=lu(c); c*=mix(vec3(0.96,0.99,1.05),vec3(1.035,1.0,0.95),smoothstep(0.15,0.85,l)); l=lu(c); c=mix(vec3(l),c,sat); c=(c-0.5)*1.03+0.5;',
       ' vec2 q=vUv-0.5; c*=1.0-vig*dot(q,q)*1.7; gl_FragColor=vec4(clamp(c,0.0,1.0),1.0); }'].join('\n')},base));
     GFX.post=Q;
   }catch(e){ GFX.post=false; }
@@ -9486,6 +9489,18 @@ try{ const m=el('div','modal'); m.id='album'; m.innerHTML='<div class="box al-bo
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('on'); });
   const f=el('div',''); f.id='flashShot'; document.body.appendChild(f); }catch(e){}
 
+/* ---------- réalisme : halo du soleil dans les ciels de jour ---------- */
+const SUNTEX=(()=>{ try{ const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d'), r=g.createRadialGradient(64,64,0,64,64,64);
+  r.addColorStop(0,'rgba(255,255,242,1)'); r.addColorStop(0.1,'rgba(255,251,225,0.95)'); r.addColorStop(0.28,'rgba(255,232,175,0.32)'); r.addColorStop(1,'rgba(255,220,150,0)');
+  g.fillStyle=r; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c); }catch(e){ return null; } })();
+{ const as=addSky; addSky=function(Gm,o){ const s=as.apply(this,arguments);
+    try{ const top=new THREE.Color(o.top||'#000000'), lum=0.299*top.r+0.587*top.g+0.114*top.b;
+      if(SUNTEX&&lum>0.3&&!o.noSun&&!o.spin){ const m=new THREE.SpriteMaterial({map:SUNTEX,color:'#ffffff',transparent:true,depthWrite:false,depthTest:false,fog:false,blending:THREE.AdditiveBlending}); m.userData.own=true;
+        const sp=new THREE.Sprite(m); sp.scale.setScalar(150); sp.renderOrder=-9; s.add(sp); s.userData.sunSp=sp; } }catch(e){}
+    return s; }; }
+function sunGlow(){ const g=G; if(!g||!g.skyDome) return; const sp=g.skyDome.userData.sunSp; if(!sp) return;
+  const d=g.sunOff||[14,30,10], l=Math.hypot(d[0],d[1],d[2])||1; sp.position.set(d[0]/l*300,Math.max(0.12,d[1]/l)*300,d[2]/l*300); }
+
 /* =========================================================
    Lancement / sortie d'un jeu
    ========================================================= */
@@ -9798,6 +9813,7 @@ function loop(now){
   autoCam(dt);
   updateCam(dt);
   envFrame(dt);
+  sunGlow();
   const sun=G.scene.userData.sun, so=G.sunOff; if(sun){ sun.position.set(P.x+(so?so[0]:14),P.y+(so?so[1]:30),P.z+(so?so[2]:10)); sun.target.position.set(P.x,P.y,P.z); }
   hudT-=dt; if(hudT<=0){ hudT=0.15; G.hud(); hudFit(); }
   tutoTick(dt);

@@ -23,14 +23,16 @@ for(const g of Object.keys(__t.GAMES)){
 __t.startGame('arena'); await wait(1500);
 document.getElementById('bHome').click(); await wait(400);
 const items=[...document.querySelectorAll('#choice.on .ch-it b')].map(b=>b.textContent);
-ok(items.length===3&&__t.getPause()===1,'🏠 ouvre la pause : '+items.join(' / '));
+ok(items.length===4&&__t.getPause()===1,'🏠 ouvre la pause : '+items.join(' / '));
 await window.__shot('tu_pause');
-document.querySelectorAll('#choice.on .ch-it')[1].click(); await wait(600);
+[...document.querySelectorAll('#choice.on .ch-it')].find(b=>/tutoriel/.test(b.textContent)).click(); await wait(600);
 ok(__t.TU.on,'« Revoir le tutoriel » le relance'); document.querySelector('#tuto .tuSkip').click(); await wait(300);
 document.getElementById('bHome').click(); await wait(300); document.querySelectorAll('#choice.on .ch-it')[0].click(); await wait(300);
 ok(__t.getPause()===0&&__t.getMode()==='game','« Continuer » reprend le jeu');
-document.getElementById('bHome').click(); await wait(300); document.querySelectorAll('#choice.on .ch-it')[2].click(); await wait(500);
+document.getElementById('bHome').click(); await wait(300); [...document.querySelectorAll('#choice.on .ch-it')].find(b=>/accueil/.test(b.textContent)).click(); await wait(500);
 ok(__t.getMode()==='menu'&&__t.getPause()===0,'« Retour à l\'accueil » quitte le jeu');
+__t.startGame('arena'); await wait(1500); localStorage.removeItem('blocsmahe-photos-v1'); document.getElementById('bHome').click(); await wait(300); [...document.querySelectorAll('#choice.on .ch-it')].find(b=>/photo/.test(b.textContent)).click(); await wait(600);
+ok(JSON.parse(localStorage.getItem('blocsmahe-photos-v1')||'[]').length===1&&__t.getPause()===0,'📸 Prendre une photo depuis la pause'); __t.exitGame(); await wait(300);
 // Bataille Royale : visée et tir automatiques
 __t.startGame('royale'); await wait(1500); await pickAll(); await wait(500);
 let G=__t.getG(); for(let k=0;k<40&&!G.pEnt.landed;k++){ __t.P.jumpBuf=0.2; await wait(400); }

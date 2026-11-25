@@ -143,9 +143,10 @@ function postInit(){
       fragmentShader:'uniform sampler2D t; uniform vec2 px; uniform float th; varying vec2 vUv; void main(){ vec3 c=(texture2D(t,vUv+px*vec2(-1.0,-1.0)).rgb+texture2D(t,vUv+px*vec2(1.0,-1.0)).rgb+texture2D(t,vUv+px*vec2(-1.0,1.0)).rgb+texture2D(t,vUv+px*vec2(1.0,1.0)).rgb)*0.25; float l=dot(c,vec3(0.299,0.587,0.114)); gl_FragColor=vec4(c*smoothstep(th,th+0.12,l),1.0); }'},base));
     Q.blur=new THREE.ShaderMaterial(Object.assign({uniforms:{t:{value:null},d:{value:new THREE.Vector2()}},vertexShader:vs,
       fragmentShader:'uniform sampler2D t; uniform vec2 d; varying vec2 vUv; void main(){ vec3 c=texture2D(t,vUv).rgb*0.227; c+=(texture2D(t,vUv+d*1.385).rgb+texture2D(t,vUv-d*1.385).rgb)*0.316; c+=(texture2D(t,vUv+d*3.231).rgb+texture2D(t,vUv-d*3.231).rgb)*0.07; gl_FragColor=vec4(c,1.0); }'},base));
-    Q.comp=new THREE.ShaderMaterial(Object.assign({uniforms:{t:{value:null},b:{value:null},px:{value:new THREE.Vector2()},bs:{value:0.5},fx:{value:MS?0:1},vig:{value:0.3},sat:{value:1.08}},vertexShader:vs,
+    Q.comp=new THREE.ShaderMaterial(Object.assign({uniforms:{t:{value:null},b:{value:null},px:{value:new THREE.Vector2()},bs:{value:0.5},fx:{value:MS?0:1},vig:{value:0.3},sat:{value:1.08},film:{value:0.55},shp:{value:0.16}},vertexShader:vs,
       fragmentShader:[
-      'uniform sampler2D t; uniform sampler2D b; uniform vec2 px; uniform float bs; uniform float fx; uniform float vig; uniform float sat; varying vec2 vUv;',
+      'uniform sampler2D t; uniform sampler2D b; uniform vec2 px; uniform float bs; uniform float fx; uniform float vig; uniform float sat; uniform float film; uniform float shp; varying vec2 vUv;',
+      'vec3 aces(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0); }',
       'float lu(vec3 c){ return dot(c,vec3(0.299,0.587,0.114)); }',
       'vec3 aa(vec2 uv){ vec3 cM=texture2D(t,uv).rgb; if(fx<0.5) return cM;',
       ' float a=lu(texture2D(t,uv+vec2(-1.0,-1.0)*px).rgb), b2=lu(texture2D(t,uv+vec2(1.0,-1.0)*px).rgb), c=lu(texture2D(t,uv+vec2(-1.0,1.0)*px).rgb), d=lu(texture2D(t,uv+vec2(1.0,1.0)*px).rgb), m=lu(cM);',
@@ -154,7 +155,9 @@ function postInit(){
       ' dir=clamp(dir*rc,vec2(-8.0),vec2(8.0))*px;',
       ' vec3 A=0.5*(texture2D(t,uv+dir*(-1.0/6.0)).rgb+texture2D(t,uv+dir*(1.0/6.0)).rgb);',
       ' vec3 B=A*0.5+0.25*(texture2D(t,uv-dir*0.5).rgb+texture2D(t,uv+dir*0.5).rgb); float lB=lu(B); return (lB<mn||lB>mx)?A:B; }',
-      'void main(){ vec3 c=aa(vUv)+texture2D(b,vUv).rgb*bs; float l=lu(c); c=mix(vec3(l),c,sat); c=(c-0.5)*1.04+0.5;',
+      'void main(){ vec3 c=aa(vUv);',
+      ' if(fx<0.5){ vec3 nb=texture2D(t,vUv+vec2(px.x,0.0)).rgb+texture2D(t,vUv-vec2(px.x,0.0)).rgb+texture2D(t,vUv+vec2(0.0,px.y)).rgb+texture2D(t,vUv-vec2(0.0,px.y)).rgb; c=c+(c*4.0-nb)*shp; }',
+      ' c+=texture2D(b,vUv).rgb*bs; c=mix(c,aces(c*1.08),film); float l=lu(c); c*=mix(vec3(0.96,0.99,1.05),vec3(1.035,1.0,0.95),smoothstep(0.15,0.85,l)); l=lu(c); c=mix(vec3(l),c,sat); c=(c-0.5)*1.03+0.5;',
       ' vec2 q=vUv-0.5; c*=1.0-vig*dot(q,q)*1.7; gl_FragColor=vec4(clamp(c,0.0,1.0),1.0); }'].join('\n')},base));
     GFX.post=Q;
   }catch(e){ GFX.post=false; }

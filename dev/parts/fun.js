@@ -129,3 +129,15 @@ try{ const m=el('div','modal'); m.id='album'; m.innerHTML='<div class="box al-bo
   document.body.appendChild(m); m.querySelector('.al-x').addEventListener('click',()=>{ sfx('click'); m.classList.remove('on'); });
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('on'); });
   const f=el('div',''); f.id='flashShot'; document.body.appendChild(f); }catch(e){}
+
+/* ---------- réalisme : halo du soleil dans les ciels de jour ---------- */
+const SUNTEX=(()=>{ try{ const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d'), r=g.createRadialGradient(64,64,0,64,64,64);
+  r.addColorStop(0,'rgba(255,255,242,1)'); r.addColorStop(0.1,'rgba(255,251,225,0.95)'); r.addColorStop(0.28,'rgba(255,232,175,0.32)'); r.addColorStop(1,'rgba(255,220,150,0)');
+  g.fillStyle=r; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c); }catch(e){ return null; } })();
+{ const as=addSky; addSky=function(Gm,o){ const s=as.apply(this,arguments);
+    try{ const top=new THREE.Color(o.top||'#000000'), lum=0.299*top.r+0.587*top.g+0.114*top.b;
+      if(SUNTEX&&lum>0.3&&!o.noSun&&!o.spin){ const m=new THREE.SpriteMaterial({map:SUNTEX,color:'#ffffff',transparent:true,depthWrite:false,depthTest:false,fog:false,blending:THREE.AdditiveBlending}); m.userData.own=true;
+        const sp=new THREE.Sprite(m); sp.scale.setScalar(150); sp.renderOrder=-9; s.add(sp); s.userData.sunSp=sp; } }catch(e){}
+    return s; }; }
+function sunGlow(){ const g=G; if(!g||!g.skyDome) return; const sp=g.skyDome.userData.sunSp; if(!sp) return;
+  const d=g.sunOff||[14,30,10], l=Math.hypot(d[0],d[1],d[2])||1; sp.position.set(d[0]/l*300,Math.max(0.12,d[1]/l)*300,d[2]/l*300); }
